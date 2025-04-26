@@ -2,7 +2,7 @@
 name = "nes"
 version = "0.1.0"
 authors = ["Starr Horne <starr@chromahq.com>"]
-edition = "2024"
+edition = "2015"
 
 [dependencies]
 bitfield = "0.12.0"
