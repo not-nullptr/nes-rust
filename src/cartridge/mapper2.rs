@@ -1,11 +1,11 @@
 // Mapper2 implements ines mapper 2 (UxROM)
 // https://wiki.nesdev.com/w/index.php/UxROM
 
-use super::pager::Page;
-use super::pager::PageSize;
 use super::CartridgeData;
 use super::Mapper;
 use super::Mirroring;
+use super::pager::Page;
+use super::pager::PageSizeKb;
 
 pub struct Mapper2 {
     data: CartridgeData,
@@ -22,13 +22,13 @@ impl Mapper for Mapper2 {
     fn read_prg_byte(&self, address: u16) -> u8 {
         match address {
             0x8000..=0xBFFF => self.data.prg_rom.read(
-                Page::Number(self.prg_0, PageSize::SixteenKb),
+                Page::Number(self.prg_0, PageSizeKb::Sixteen),
                 address - 0x8000,
             ),
             0xC000..=0xFFFF => self
                 .data
                 .prg_rom
-                .read(Page::Last(PageSize::SixteenKb), address - 0xC000),
+                .read(Page::Last(PageSizeKb::Sixteen), address - 0xC000),
             a => panic!("bad address: {:04X}", a),
         }
     }
@@ -46,11 +46,11 @@ impl Mapper for Mapper2 {
         if self.data.header.chr_rom_pages == 0 {
             self.data
                 .chr_ram
-                .read(Page::First(PageSize::EightKb), address)
+                .read(Page::First(PageSizeKb::Eight), address)
         } else {
             self.data
                 .chr_rom
-                .read(Page::First(PageSize::EightKb), address)
+                .read(Page::First(PageSizeKb::Eight), address)
         }
     }
 
@@ -58,7 +58,7 @@ impl Mapper for Mapper2 {
         if self.data.header.chr_rom_pages == 0 {
             self.data
                 .chr_ram
-                .write(Page::First(PageSize::EightKb), address, value)
+                .write(Page::First(PageSizeKb::Eight), address, value)
         }
     }
 

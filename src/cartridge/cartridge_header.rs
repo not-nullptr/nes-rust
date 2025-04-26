@@ -13,13 +13,11 @@ pub struct CartridgeHeader {
     pub prg_rom_pages: usize,
     pub prg_ram_pages: usize,
     pub chr_rom_pages: usize,
-    pub preamble: bool,
 }
 
 impl CartridgeHeader {
     pub fn new(data: &[u8]) -> Self {
         CartridgeHeader {
-            preamble: data[0..4] == [0x4e, 0x45, 0x53, 0x1a],
             mirroring: if data[6] & 1 == 0 {
                 Mirroring::Horizontal
             } else {
@@ -74,7 +72,6 @@ mod test {
     #[test]
     fn test_sizes() {
         let header = CartridgeHeader::new(&HEADER);
-        assert!(header.preamble);
         assert_eq!(Mirroring::Vertical, header.mirroring);
         assert_eq!(0x10, header.prg_rom_pages);
         assert_eq!(0x10 * PRG_ROM_PAGE_SIZE, header.prg_rom_bytes());

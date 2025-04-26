@@ -26,29 +26,12 @@ macro_rules! build_cpu {
         cpu
     }};
 }
-macro_rules! build_cpu_and_run {
-    ($instruction:expr_2021, $mode:ident, $bytes:expr_2021) => {{
-        let op = opcode($instruction, $mode);
-        let mut mem = $bytes;
-        mem.insert(0, op.code);
-        let mut cpu = build_cpu!(mem);
-        let start_pc = cpu.pc;
-        let start_cycles = cpu.bus.cycles;
-        let start_p = cpu.p;
-        cpu.execute_next_instruction();
-        assert_eq!(0, cpu.p & start_p & !op.mask);
-        assert_eq!(op.size, cpu.pc - start_pc);
-        assert_eq!(op.cycles, cpu.bus.cycles - start_cycles);
-        cpu
-    }};
-}
 
 macro_rules! test_op {
     ($instruction:expr_2021, $mode:ident, [$($b:expr_2021),*]{$($sk:ident : $sv:expr_2021),*} => [$($rb:expr_2021),*]{$($ek:ident : $ev:expr_2021),*}) => {
         {
             let op = opcode($instruction, $mode);
-            let mut mem = Vec::new();
-            $(mem.push($b);)*
+            let mut mem = vec![$($b),*];
             mem.insert(0, op.code);
             let mut cpu = build_cpu!(mem);
             let start_pc = cpu.pc;
@@ -66,8 +49,7 @@ macro_rules! test_op {
             $(
                 assert!(cpu.$ek==$ev, "Incorrect Register. Expected cpu.{} to be {}, got {}", stringify!($ek), stringify!($ev), cpu.$ek);
             )*
-            let mut mem = Vec::new();
-            $(mem.push($rb);)*
+            let mut mem = vec![$($rb),*];
             mem.insert(0, op.code);
             for (i, &b) in mem.iter().enumerate() {
                 assert!(cpu.bus.ram[i]==b, "Incorrect Memory. Expected ram[{}] to be {}, got {}", i, b, cpu.bus.ram[i]);
@@ -267,7 +249,7 @@ fn test_ror() {
     test_op!("ror", ZeroPageX,  [0x02, 0, 1]{p:0, x: 1} => [0x02, 0]{p: 0b00000011});
     test_op!("ror", Absolute,  [0x03, 0, 1]{p:0} => [0x03, 0]{p: 0b00000011});
     test_op!("ror", AbsoluteX,  [0x02, 0, 1]{p:0, x: 1} => [0x02, 0]{p: 0b00000011});
-    test_op!("ror", NoMode, []{a: 2} => []{a: 1});
+    test_op!("ror", None, []{a: 2} => []{a: 1});
 }
 
 #[test]
@@ -278,7 +260,7 @@ fn test_asl() {
     test_op!("asl", ZeroPageX, [0x02, 0, 1]{x: 1} => [0x02, 0, 2]{});
     test_op!("asl", Absolute,  [0x03, 0, 1]{} => [0x03, 0, 2]{});
     test_op!("asl", AbsoluteX, [0x03, 0, 0, 1]{x: 1} => [0x03, 0, 0, 2]{});
-    test_op!("asl", NoMode, []{a: 1} => []{a: 2});
+    test_op!("asl", None, []{a: 1} => []{a: 2});
 }
 
 #[test]
@@ -288,7 +270,7 @@ fn test_lsr() {
     test_op!("lsr", ZeroPageX, [0x02, 0, 2]{x: 1} => [0x02, 0, 1]{});
     test_op!("lsr", Absolute,  [0x03, 0, 2]{} => [0x03, 0, 1]{});
     test_op!("lsr", AbsoluteX, [0x03, 0, 0, 2]{x: 1} => [0x03, 0, 0, 1]{});
-    test_op!("lsr", NoMode, []{a: 2} => []{a: 1});
+    test_op!("lsr", None, []{a: 2} => []{a: 1});
 }
 
 #[test]
@@ -311,84 +293,84 @@ fn test_dec() {
 
 #[test]
 fn test_inx() {
-    test_op!("inx", NoMode,  []{x: 255} => []{x: 0, p: 0b00000010});
-    test_op!("inx", NoMode,  []{x: 127} => []{x: 128, p: 0b10000000});
+    test_op!("inx", None,  []{x: 255} => []{x: 0, p: 0b00000010});
+    test_op!("inx", None,  []{x: 127} => []{x: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_dex() {
-    test_op!("dex", NoMode,  []{x: 1} => []{x: 0, p: 0b00000010});
-    test_op!("dex", NoMode,  []{x: 0} => []{x: 255, p: 0b10000000});
+    test_op!("dex", None,  []{x: 1} => []{x: 0, p: 0b00000010});
+    test_op!("dex", None,  []{x: 0} => []{x: 255, p: 0b10000000});
 }
 
 #[test]
 fn test_iny() {
-    test_op!("iny", NoMode,  []{y: 255} => []{y: 0, p: 0b00000010});
-    test_op!("iny", NoMode,  []{y: 127} => []{y: 128, p: 0b10000000});
+    test_op!("iny", None,  []{y: 255} => []{y: 0, p: 0b00000010});
+    test_op!("iny", None,  []{y: 127} => []{y: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_dey() {
-    test_op!("dey", NoMode,  []{y: 1} => []{y: 0, p: 0b00000010});
-    test_op!("dey", NoMode,  []{y: 0} => []{y: 255, p: 0b10000000});
+    test_op!("dey", None,  []{y: 1} => []{y: 0, p: 0b00000010});
+    test_op!("dey", None,  []{y: 0} => []{y: 255, p: 0b10000000});
 }
 
 #[test]
 fn test_tax() {
-    test_op!("tax", NoMode,  []{a: 1} => []{a: 1, x: 1, p: 0b00000000});
-    test_op!("tax", NoMode,  []{a: 0} => []{a: 0, x: 0, p: 0b00000010});
-    test_op!("tax", NoMode,  []{a: 128} => []{a: 128, x: 128, p: 0b10000000});
+    test_op!("tax", None,  []{a: 1} => []{a: 1, x: 1, p: 0b00000000});
+    test_op!("tax", None,  []{a: 0} => []{a: 0, x: 0, p: 0b00000010});
+    test_op!("tax", None,  []{a: 128} => []{a: 128, x: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_tay() {
-    test_op!("tay", NoMode,  []{a: 1} => []{a: 1, y: 1, p: 0b00000000});
-    test_op!("tay", NoMode,  []{a: 0} => []{a: 0, y: 0, p: 0b00000010});
-    test_op!("tay", NoMode,  []{a: 128} => []{a: 128, y: 128, p: 0b10000000});
+    test_op!("tay", None,  []{a: 1} => []{a: 1, y: 1, p: 0b00000000});
+    test_op!("tay", None,  []{a: 0} => []{a: 0, y: 0, p: 0b00000010});
+    test_op!("tay", None,  []{a: 128} => []{a: 128, y: 128, p: 0b10000000});
 }
 #[test]
 fn test_txa() {
-    test_op!("txa", NoMode,  []{x: 1} => []{a: 1, x: 1, p: 0b00000000});
-    test_op!("txa", NoMode,  []{x: 0} => []{a: 0, x: 0, p: 0b00000010});
-    test_op!("txa", NoMode,  []{x: 128} => []{a: 128, x: 128, p: 0b10000000});
+    test_op!("txa", None,  []{x: 1} => []{a: 1, x: 1, p: 0b00000000});
+    test_op!("txa", None,  []{x: 0} => []{a: 0, x: 0, p: 0b00000010});
+    test_op!("txa", None,  []{x: 128} => []{a: 128, x: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_tya() {
-    test_op!("tya", NoMode,  []{y: 1} => []{a: 1, y: 1, p: 0b00000000});
-    test_op!("tya", NoMode,  []{y: 0} => []{a: 0, y: 0, p: 0b00000010});
-    test_op!("tya", NoMode,  []{y: 128} => []{a: 128, y: 128, p: 0b10000000});
+    test_op!("tya", None,  []{y: 1} => []{a: 1, y: 1, p: 0b00000000});
+    test_op!("tya", None,  []{y: 0} => []{a: 0, y: 0, p: 0b00000010});
+    test_op!("tya", None,  []{y: 128} => []{a: 128, y: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_tsx() {
-    test_op!("tsx", NoMode,  []{sp: 1} => []{sp: 1, x: 1, p: 0b00000000});
-    test_op!("tsx", NoMode,  []{sp: 0} => []{sp: 0, x: 0, p: 0b00000010});
-    test_op!("tsx", NoMode,  []{sp: 128} => []{sp: 128, x: 128, p: 0b10000000});
+    test_op!("tsx", None,  []{sp: 1} => []{sp: 1, x: 1, p: 0b00000000});
+    test_op!("tsx", None,  []{sp: 0} => []{sp: 0, x: 0, p: 0b00000010});
+    test_op!("tsx", None,  []{sp: 128} => []{sp: 128, x: 128, p: 0b10000000});
 }
 
 #[test]
 fn test_txs() {
-    test_op!("txs", NoMode,  []{x: 1} => []{sp: 1, x: 1, p: 0});
+    test_op!("txs", None,  []{x: 1} => []{sp: 1, x: 1, p: 0});
 }
 
 #[test]
 fn test_flag_ops() {
-    test_op!("clc", NoMode, []{p: 0b11111111} => []{p: 0b11111110});
-    test_op!("sec", NoMode, []{p: 0} => []{p: 1});
-    test_op!("cli", NoMode, []{p: 0b11111111} => []{p: 0b11111011});
-    test_op!("sei", NoMode, []{p: 0} => []{p: 0b00000100});
-    test_op!("clv", NoMode, []{p: 0b11111111} => []{p: 0b10111111});
-    test_op!("cld", NoMode, []{p: 0b11111111} => []{p: 0b11110111});
-    test_op!("sed", NoMode, []{p: 0} => []{p: 0b00001000});
+    test_op!("clc", None, []{p: 0b11111111} => []{p: 0b11111110});
+    test_op!("sec", None, []{p: 0} => []{p: 1});
+    test_op!("cli", None, []{p: 0b11111111} => []{p: 0b11111011});
+    test_op!("sei", None, []{p: 0} => []{p: 0b00000100});
+    test_op!("clv", None, []{p: 0b11111111} => []{p: 0b10111111});
+    test_op!("cld", None, []{p: 0b11111111} => []{p: 0b11110111});
+    test_op!("sed", None, []{p: 0} => []{p: 0b00001000});
 }
 
 #[test]
 fn test_bpl() {
-    let cpu = test_op!("bpl", NoMode, [10]{p: 0b10000000} => []{pc: 2});
+    let cpu = test_op!("bpl", None, [10]{p: 0b10000000} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bpl", NoMode, [10]{p: 0} => []{pc: 12});
+    let cpu = test_op!("bpl", None, [10]{p: 0} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 
     // Test page boundary cross
@@ -403,10 +385,10 @@ fn test_bpl() {
 
 #[test]
 fn test_bmi() {
-    let cpu = test_op!("bmi", NoMode, [10]{p: 0} => []{pc: 2});
+    let cpu = test_op!("bmi", None, [10]{p: 0} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bmi", NoMode, [10]{p: 0b10000000} => []{pc: 12});
+    let cpu = test_op!("bmi", None, [10]{p: 0b10000000} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 
     // Test page boundary cross
@@ -422,55 +404,55 @@ fn test_bmi() {
 
 #[test]
 fn test_bvc() {
-    let cpu = test_op!("bvc", NoMode, [10]{p: 0b01000000} => []{pc: 2});
+    let cpu = test_op!("bvc", None, [10]{p: 0b01000000} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bvc", NoMode, [10]{p: 0} => []{pc: 12});
+    let cpu = test_op!("bvc", None, [10]{p: 0} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
 #[test]
 fn test_bvs() {
-    let cpu = test_op!("bvs", NoMode, [10]{p: 0b00000000} => []{pc: 2});
+    let cpu = test_op!("bvs", None, [10]{p: 0b00000000} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bvs", NoMode, [10]{p: 0b01000000} => []{pc: 12});
+    let cpu = test_op!("bvs", None, [10]{p: 0b01000000} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
 #[test]
 fn test_bcc() {
-    let cpu = test_op!("bcc", NoMode, [10]{p: 0b00000001} => []{pc: 2});
+    let cpu = test_op!("bcc", None, [10]{p: 0b00000001} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bcc", NoMode, [10]{p: 0} => []{pc: 12});
+    let cpu = test_op!("bcc", None, [10]{p: 0} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
 #[test]
 fn test_bcs() {
-    let cpu = test_op!("bcs", NoMode, [10]{p: 0b00000000} => []{pc: 2});
+    let cpu = test_op!("bcs", None, [10]{p: 0b00000000} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bcs", NoMode, [10]{p: 0b00000001} => []{pc: 12});
+    let cpu = test_op!("bcs", None, [10]{p: 0b00000001} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
 #[test]
 fn test_bne() {
-    let cpu = test_op!("bne", NoMode, [10]{p: 0b00000010} => []{pc: 2});
+    let cpu = test_op!("bne", None, [10]{p: 0b00000010} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("bne", NoMode, [10]{p: 0} => []{pc: 12});
+    let cpu = test_op!("bne", None, [10]{p: 0} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
 #[test]
 fn test_beq() {
-    let cpu = test_op!("beq", NoMode, [10]{p: 0b00000000} => []{pc: 2});
+    let cpu = test_op!("beq", None, [10]{p: 0b00000000} => []{pc: 2});
     assert_eq!(cpu.bus.cycles, 2);
 
-    let cpu = test_op!("beq", NoMode, [10]{p: 0b00000010} => []{pc: 12});
+    let cpu = test_op!("beq", None, [10]{p: 0b00000010} => []{pc: 12});
     assert_eq!(cpu.bus.cycles, 3);
 }
 
@@ -530,7 +512,7 @@ fn test_brk() {
 
 #[test]
 fn test_pha_pla() {
-    let mut cpu = test_op!("pha", NoMode, []{a: 0x57} => []{});
+    let mut cpu = test_op!("pha", None, []{a: 0x57} => []{});
     cpu.a = 0;
     cpu.bus.cycles = 0;
     cpu.pla();
@@ -540,7 +522,7 @@ fn test_pha_pla() {
 
 #[test]
 fn test_php_plp() {
-    let mut cpu = test_op!("php", NoMode, []{p: 0x57} => []{});
+    let mut cpu = test_op!("php", None, []{p: 0x57} => []{});
     cpu.p = 0;
     cpu.bus.cycles = 0;
     cpu.plp();
@@ -553,7 +535,6 @@ struct Op {
     code: u8,
     size: u16,
     cycles: u64,
-    check: bool,
     mask: u8,
 }
 
@@ -563,1057 +544,1054 @@ fn opcode(name: &str, mode: Mode) -> Op {
             code: 0x69,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b11000011,
         },
         ("adc", ZeroPage) => Op {
             code: 0x65,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b11000011,
         },
         ("adc", ZeroPageX) => Op {
             code: 0x75,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b11000011,
         },
         ("adc", Absolute) => Op {
             code: 0x6D,
             size: 3,
             cycles: 4,
-            check: false,
             mask: 0b11000011,
         },
         ("adc", AbsoluteX) => Op {
             code: 0x7D,
             size: 3,
             cycles: 4,
-            check: true,
             mask: 0b11000011,
         },
         ("adc", AbsoluteY) => Op {
             code: 0x79,
             size: 3,
             cycles: 4,
-            check: true,
             mask: 0b11000011,
         },
         ("adc", IndirectX) => Op {
             code: 0x61,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b11000011,
         },
         ("adc", IndirectY) => Op {
             code: 0x71,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b11000011,
         },
         ("and", Immediate) => Op {
             code: 0x29,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("and", ZeroPage) => Op {
             code: 0x25,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("and", ZeroPageX) => Op {
             code: 0x35,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("and", Absolute) => Op {
             code: 0x2D,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("and", AbsoluteX) => Op {
             code: 0x3D,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("and", AbsoluteY) => Op {
             code: 0x39,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("and", IndirectX) => Op {
             code: 0x21,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("and", IndirectY) => Op {
             code: 0x31,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b10000010,
         },
-        ("asl", NoMode) => Op {
+        ("asl", None) => Op {
             code: 0x0A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("asl", ZeroPage) => Op {
             code: 0x06,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000011,
         },
         ("asl", ZeroPageX) => Op {
             code: 0x16,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("asl", Absolute) => Op {
             code: 0x0E,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("asl", AbsoluteX) => Op {
             code: 0x1E,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000011,
         },
-        ("bcc", NoMode) => Op {
+        ("bcc", None) => Op {
             code: 0x90,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("bcs", NoMode) => Op {
+        ("bcs", None) => Op {
             code: 0xB0,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("beq", NoMode) => Op {
+        ("beq", None) => Op {
             code: 0xF0,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
         ("bit", ZeroPage) => Op {
             code: 0x24,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b11000010,
         },
         ("bit", Absolute) => Op {
             code: 0x2C,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b11000010,
         },
-        ("bmi", NoMode) => Op {
+        ("bmi", None) => Op {
             code: 0x30,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("bne", NoMode) => Op {
+        ("bne", None) => Op {
             code: 0xD0,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("bpl", NoMode) => Op {
+        ("bpl", None) => Op {
             code: 0x10,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("brk", NoMode) => Op {
+        ("brk", None) => Op {
             code: 0x00,
             size: 0,
             cycles: 7,
-            check: false,
+
             mask: 0b00010000,
         },
-        ("bvc", NoMode) => Op {
+        ("bvc", None) => Op {
             code: 0x50,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("bvs", NoMode) => Op {
+        ("bvs", None) => Op {
             code: 0x70,
             size: 0,
             cycles: 0,
-            check: true,
+
             mask: 0b00000000,
         },
-        ("clc", NoMode) => Op {
+        ("clc", None) => Op {
             code: 0x18,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000001,
         },
-        ("cld", NoMode) => Op {
+        ("cld", None) => Op {
             code: 0xD8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00001000,
         },
-        ("cli", NoMode) => Op {
+        ("cli", None) => Op {
             code: 0x58,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000100,
         },
-        ("clv", NoMode) => Op {
+        ("clv", None) => Op {
             code: 0xB8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b01000000,
         },
         ("cmp", Immediate) => Op {
             code: 0xC9,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cmp", ZeroPage) => Op {
             code: 0xC5,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cmp", ZeroPageX) => Op {
             code: 0xD5,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cmp", Absolute) => Op {
             code: 0xCD,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cmp", AbsoluteX) => Op {
             code: 0xDD,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000011,
         },
         ("cmp", AbsoluteY) => Op {
             code: 0xD9,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000011,
         },
         ("cmp", IndirectX) => Op {
             code: 0xC1,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cmp", IndirectY) => Op {
             code: 0xD1,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b10000011,
         },
         ("cpx", Immediate) => Op {
             code: 0xE0,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cpx", ZeroPage) => Op {
             code: 0xE4,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cpx", Absolute) => Op {
             code: 0xEC,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cpy", Immediate) => Op {
             code: 0xC0,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cpy", ZeroPage) => Op {
             code: 0xC4,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000011,
         },
         ("cpy", Absolute) => Op {
             code: 0xCC,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000011,
         },
         ("dec", ZeroPage) => Op {
             code: 0xC6,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000010,
         },
         ("dec", ZeroPageX) => Op {
             code: 0xD6,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("dec", Absolute) => Op {
             code: 0xCE,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("dec", AbsoluteX) => Op {
             code: 0xDE,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("dex", NoMode) => Op {
+        ("dex", None) => Op {
             code: 0xCA,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("dey", NoMode) => Op {
+        ("dey", None) => Op {
             code: 0x88,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", Immediate) => Op {
             code: 0x49,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", ZeroPage) => Op {
             code: 0x45,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", ZeroPageX) => Op {
             code: 0x55,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", Absolute) => Op {
             code: 0x4D,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", AbsoluteX) => Op {
             code: 0x5D,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("eor", AbsoluteY) => Op {
             code: 0x59,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("eor", IndirectX) => Op {
             code: 0x41,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("eor", IndirectY) => Op {
             code: 0x51,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b10000010,
         },
         ("inc", ZeroPage) => Op {
             code: 0xE6,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000010,
         },
         ("inc", ZeroPageX) => Op {
             code: 0xF6,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("inc", Absolute) => Op {
             code: 0xEE,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("inc", AbsoluteX) => Op {
             code: 0xFE,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("inx", NoMode) => Op {
+        ("inx", None) => Op {
             code: 0xE8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("iny", NoMode) => Op {
+        ("iny", None) => Op {
             code: 0xC8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("jmp", Absolute) => Op {
             code: 0x4C,
             size: 0,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
         ("jmp", Indirect) => Op {
             code: 0x6C,
             size: 0,
             cycles: 5,
-            check: false,
+
             mask: 0b00000000,
         },
         ("jsr", Absolute) => Op {
             code: 0x20,
             size: 0,
             cycles: 6,
-            check: false,
+
             mask: 0b00000000,
         },
         ("lda", Immediate) => Op {
             code: 0xA9,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("lda", ZeroPage) => Op {
             code: 0xA5,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("lda", ZeroPageX) => Op {
             code: 0xB5,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("lda", Absolute) => Op {
             code: 0xAD,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("lda", AbsoluteX) => Op {
             code: 0xBD,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("lda", AbsoluteY) => Op {
             code: 0xB9,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("lda", IndirectX) => Op {
             code: 0xA1,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("lda", IndirectY) => Op {
             code: 0xB1,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b10000010,
         },
         ("ldx", Immediate) => Op {
             code: 0xA2,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldx", ZeroPage) => Op {
             code: 0xA6,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldx", ZeroPageY) => Op {
             code: 0xB6,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldx", Absolute) => Op {
             code: 0xAE,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldx", AbsoluteY) => Op {
             code: 0xBE,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("ldy", Immediate) => Op {
             code: 0xA0,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldy", ZeroPage) => Op {
             code: 0xA4,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldy", ZeroPageX) => Op {
             code: 0xB4,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldy", Absolute) => Op {
             code: 0xAC,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ldy", AbsoluteX) => Op {
             code: 0xBC,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
-        ("lsr", NoMode) => Op {
+        ("lsr", None) => Op {
             code: 0x4A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("lsr", ZeroPage) => Op {
             code: 0x46,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000011,
         },
         ("lsr", ZeroPageX) => Op {
             code: 0x56,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("lsr", Absolute) => Op {
             code: 0x4E,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("lsr", AbsoluteX) => Op {
             code: 0x5E,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000011,
         },
-        ("nop", NoMode) => Op {
+        ("nop", None) => Op {
             code: 0xEA,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000000,
         },
         ("ora", Immediate) => Op {
             code: 0x09,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ora", ZeroPage) => Op {
             code: 0x05,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ora", ZeroPageX) => Op {
             code: 0x15,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ora", Absolute) => Op {
             code: 0x0D,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ora", AbsoluteX) => Op {
             code: 0x1D,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("ora", AbsoluteY) => Op {
             code: 0x19,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b10000010,
         },
         ("ora", IndirectX) => Op {
             code: 0x01,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000010,
         },
         ("ora", IndirectY) => Op {
             code: 0x11,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b10000010,
         },
-        ("pha", NoMode) => Op {
+        ("pha", None) => Op {
             code: 0x48,
             size: 1,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
-        ("php", NoMode) => Op {
+        ("php", None) => Op {
             code: 0x08,
             size: 1,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
-        ("pla", NoMode) => Op {
+        ("pla", None) => Op {
             code: 0x68,
             size: 1,
             cycles: 4,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("plp", NoMode) => Op {
+        ("plp", None) => Op {
             code: 0x28,
             size: 1,
             cycles: 4,
-            check: false,
+
             mask: 0b11011111,
         },
-        ("rol", NoMode) => Op {
+        ("rol", None) => Op {
             code: 0x2A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("rol", ZeroPage) => Op {
             code: 0x26,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000011,
         },
         ("rol", ZeroPageX) => Op {
             code: 0x36,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("rol", Absolute) => Op {
             code: 0x2E,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("rol", AbsoluteX) => Op {
             code: 0x3E,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000011,
         },
-        ("ror", NoMode) => Op {
+        ("ror", None) => Op {
             code: 0x6A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000011,
         },
         ("ror", ZeroPage) => Op {
             code: 0x66,
             size: 2,
             cycles: 5,
-            check: false,
+
             mask: 0b10000011,
         },
         ("ror", ZeroPageX) => Op {
             code: 0x76,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("ror", Absolute) => Op {
             code: 0x6E,
             size: 3,
             cycles: 6,
-            check: false,
+
             mask: 0b10000011,
         },
         ("ror", AbsoluteX) => Op {
             code: 0x7E,
             size: 3,
             cycles: 7,
-            check: false,
+
             mask: 0b10000011,
         },
-        ("rti", NoMode) => Op {
+        ("rti", None) => Op {
             code: 0x40,
             size: 1,
             cycles: 6,
-            check: false,
+
             mask: 0b11011111,
         },
-        ("rts", NoMode) => Op {
+        ("rts", None) => Op {
             code: 0x60,
             size: 0,
             cycles: 6,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sbc", Immediate) => Op {
             code: 0xE9,
             size: 2,
             cycles: 2,
-            check: false,
+
             mask: 0b11000011,
         },
         ("sbc", ZeroPage) => Op {
             code: 0xE5,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b11000011,
         },
         ("sbc", ZeroPageX) => Op {
             code: 0xF5,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b11000011,
         },
         ("sbc", Absolute) => Op {
             code: 0xED,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b11000011,
         },
         ("sbc", AbsoluteX) => Op {
             code: 0xFD,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b11000011,
         },
         ("sbc", AbsoluteY) => Op {
             code: 0xF9,
             size: 3,
             cycles: 4,
-            check: true,
+
             mask: 0b11000011,
         },
         ("sbc", IndirectX) => Op {
             code: 0xE1,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b11000011,
         },
         ("sbc", IndirectY) => Op {
             code: 0xF1,
             size: 2,
             cycles: 5,
-            check: true,
+
             mask: 0b11000011,
         },
-        ("sec", NoMode) => Op {
+        ("sec", None) => Op {
             code: 0x38,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000001,
         },
-        ("sed", NoMode) => Op {
+        ("sed", None) => Op {
             code: 0xF8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00001000,
         },
-        ("sei", NoMode) => Op {
+        ("sei", None) => Op {
             code: 0x78,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000100,
         },
         ("sta", ZeroPage) => Op {
             code: 0x85,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", ZeroPageX) => Op {
             code: 0x95,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", Absolute) => Op {
             code: 0x8D,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", AbsoluteX) => Op {
             code: 0x9D,
             size: 3,
             cycles: 5,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", AbsoluteY) => Op {
             code: 0x99,
             size: 3,
             cycles: 5,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", IndirectX) => Op {
             code: 0x81,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sta", IndirectY) => Op {
             code: 0x91,
             size: 2,
             cycles: 6,
-            check: false,
+
             mask: 0b00000000,
         },
         ("stx", ZeroPage) => Op {
             code: 0x86,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
         ("stx", ZeroPageY) => Op {
             code: 0x96,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
         ("stx", Absolute) => Op {
             code: 0x8E,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sty", ZeroPage) => Op {
             code: 0x84,
             size: 2,
             cycles: 3,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sty", ZeroPageX) => Op {
             code: 0x94,
             size: 2,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
         ("sty", Absolute) => Op {
             code: 0x8C,
             size: 3,
             cycles: 4,
-            check: false,
+
             mask: 0b00000000,
         },
-        ("tax", NoMode) => Op {
+        ("tax", None) => Op {
             code: 0xAA,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("tay", NoMode) => Op {
+        ("tay", None) => Op {
             code: 0xA8,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("tsx", NoMode) => Op {
+        ("tsx", None) => Op {
             code: 0xBA,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("txa", NoMode) => Op {
+        ("txa", None) => Op {
             code: 0x8A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
-        ("txs", NoMode) => Op {
+        ("txs", None) => Op {
             code: 0x9A,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b00000000,
         },
-        ("tya", NoMode) => Op {
+        ("tya", None) => Op {
             code: 0x98,
             size: 1,
             cycles: 2,
-            check: false,
+
             mask: 0b10000010,
         },
         (_, _) => panic!("invalid instruction"),

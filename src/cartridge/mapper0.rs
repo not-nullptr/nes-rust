@@ -2,7 +2,7 @@
 // http://wiki.nesdev.com/w/index.php/NROM
 
 use super::pager::Page;
-use super::pager::PageSize;
+use super::pager::PageSizeKb;
 use super::CartridgeData;
 use super::Mapper;
 use super::Mirroring;
@@ -23,15 +23,15 @@ impl Mapper for Mapper0 {
             0x6000..=0x7FFF => self
                 .data
                 .prg_ram
-                .read(Page::First(PageSize::EightKb), address - 0x6000),
+                .read(Page::First(PageSizeKb::Eight), address - 0x6000),
             0x8000..=0xBFFF => self
                 .data
                 .prg_rom
-                .read(Page::First(PageSize::SixteenKb), address - 0x8000),
+                .read(Page::First(PageSizeKb::Sixteen), address - 0x8000),
             0xC000..=0xFFFF => self
                 .data
                 .prg_rom
-                .read(Page::Last(PageSize::SixteenKb), address - 0xC000),
+                .read(Page::Last(PageSizeKb::Sixteen), address - 0xC000),
             a => panic!("bad address: {:04X}", a),
         }
     }
@@ -41,7 +41,7 @@ impl Mapper for Mapper0 {
             0x6000..=0x7FFF => {
                 self.data
                     .prg_ram
-                    .write(Page::First(PageSize::EightKb), address - 0x6000, value)
+                    .write(Page::First(PageSizeKb::Eight), address - 0x6000, value)
             }
             _ => panic!("bad address"),
         }
@@ -51,11 +51,11 @@ impl Mapper for Mapper0 {
         if self.data.header.chr_rom_pages == 0 {
             self.data
                 .chr_ram
-                .read(Page::First(PageSize::EightKb), address)
+                .read(Page::First(PageSizeKb::Eight), address)
         } else {
             self.data
                 .chr_rom
-                .read(Page::First(PageSize::EightKb), address)
+                .read(Page::First(PageSizeKb::Eight), address)
         }
     }
 
@@ -63,7 +63,7 @@ impl Mapper for Mapper0 {
         if self.data.header.chr_rom_pages == 0 {
             self.data
                 .chr_ram
-                .write(Page::First(PageSize::EightKb), address, value)
+                .write(Page::First(PageSizeKb::Eight), address, value)
         }
     }
 

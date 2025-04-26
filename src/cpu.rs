@@ -31,7 +31,7 @@ enum Mode {
     IndirectX,
     IndirectY,
     IndirectYForceTick,
-    NoMode,
+    None,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -204,7 +204,7 @@ impl Cpu {
                 self.bus.tick();
                 offset(base, self.y)
             }
-            Mode::NoMode => panic!("Mode::NoMode should never be used to read from memory"),
+            Mode::None => panic!("Mode::NoMode should never be used to read from memory"),
         }
     }
 

@@ -2,7 +2,7 @@
 // https://wiki.nesdev.com/w/index.php/INES_Mapper_003
 
 use super::pager::Page;
-use super::pager::PageSize;
+use super::pager::PageSizeKb;
 use super::CartridgeData;
 use super::Mapper;
 use super::Mirroring;
@@ -24,11 +24,11 @@ impl Mapper for Mapper3 {
             0x8000..=0xBFFF => self
                 .data
                 .prg_rom
-                .read(Page::First(PageSize::SixteenKb), address - 0x8000),
+                .read(Page::First(PageSizeKb::Sixteen), address - 0x8000),
             0xC000..=0xFFFF => self
                 .data
                 .prg_rom
-                .read(Page::Last(PageSize::SixteenKb), address - 0xC000),
+                .read(Page::Last(PageSizeKb::Sixteen), address - 0xC000),
             a => panic!("bad address: {:04X}", a),
         }
     }
@@ -42,7 +42,7 @@ impl Mapper for Mapper3 {
     fn read_chr_byte(&self, address: u16) -> u8 {
         self.data
             .chr_rom
-            .read(Page::Number(self.chr_0, PageSize::EightKb), address)
+            .read(Page::Number(self.chr_0, PageSizeKb::Eight), address)
     }
 
     fn write_chr_byte(&mut self, _: u16, _: u8) {}

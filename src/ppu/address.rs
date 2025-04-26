@@ -83,7 +83,7 @@ mod test {
 
     #[test]
     fn test_loopy() {
-        let a = Address(0b0_101_01_01010_10101);
+        let a = Address(0b0101_0101_0101_0101);
         assert_eq!(a.coarse_x(), 0b10101);
         assert_eq!(a.coarse_y(), 0b01010);
         assert_eq!(a.nametable(), 0b01);

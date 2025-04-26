@@ -1,8 +1,8 @@
 use crate::apu::Apu;
 use crate::cartridge::Cartridge;
 use crate::controller::Controller;
-use crate::ppu::result::PpuResult;
 use crate::ppu::Ppu;
+use crate::ppu::result::PpuResult;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -110,7 +110,6 @@ impl Bus {
                     c.borrow_mut().write_prg_byte(address, value);
                 }
             }
-            _ => (),
         }
     }
 

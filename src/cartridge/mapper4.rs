@@ -1,11 +1,11 @@
 // Mapper4 implements ines mapper 4 (MMC3)
 // https://wiki.nesdev.com/w/index.php/MMC3
 
-use super::pager::Page;
-use super::pager::PageSize;
 use super::CartridgeData;
 use super::Mapper;
 use super::Mirroring;
+use super::pager::Page;
+use super::pager::PageSizeKb;
 
 pub struct Mapper4 {
     data: CartridgeData,
@@ -45,31 +45,31 @@ impl Mapper for Mapper4 {
             (0x6000..=0x7FFF, _) => self
                 .data
                 .prg_ram
-                .read(Page::First(PageSize::EightKb), address - 0x6000),
+                .read(Page::First(PageSizeKb::Eight), address - 0x6000),
             (0x8000..=0x9FFF, false) => self.data.prg_rom.read(
-                Page::Number(self.registers[6], PageSize::EightKb),
+                Page::Number(self.registers[6], PageSizeKb::Eight),
                 address - 0x8000,
             ),
             (0x8000..=0x9FFF, true) => self
                 .data
                 .prg_rom
-                .read(Page::FromEnd(1, PageSize::EightKb), address - 0x8000),
+                .read(Page::FromEnd(1, PageSizeKb::Eight), address - 0x8000),
             (0xA000..=0xBFFF, _) => self.data.prg_rom.read(
-                Page::Number(self.registers[7], PageSize::EightKb),
+                Page::Number(self.registers[7], PageSizeKb::Eight),
                 address - 0xA000,
             ),
             (0xC000..=0xDFFF, false) => self
                 .data
                 .prg_rom
-                .read(Page::FromEnd(1, PageSize::EightKb), address - 0xC000),
+                .read(Page::FromEnd(1, PageSizeKb::Eight), address - 0xC000),
             (0xC000..=0xDFFF, true) => self.data.prg_rom.read(
-                Page::Number(self.registers[6], PageSize::EightKb),
+                Page::Number(self.registers[6], PageSizeKb::Eight),
                 address - 0xC000,
             ),
             (0xE000..=0xFFFF, _) => self
                 .data
                 .prg_rom
-                .read(Page::FromEnd(0, PageSize::EightKb), address - 0xE000),
+                .read(Page::FromEnd(0, PageSizeKb::Eight), address - 0xE000),
             (a, _m) => panic!("bad address: {:04X}", a),
         }
     }
@@ -79,7 +79,7 @@ impl Mapper for Mapper4 {
             (0x6000..=0x7FFF, _) => {
                 self.data
                     .prg_ram
-                    .write(Page::First(PageSize::EightKb), address - 0x6000, value)
+                    .write(Page::First(PageSizeKb::Eight), address - 0x6000, value)
             }
             (0x8000..=0x9FFF, 0) => {
                 self.index = value as usize & 0b111;
@@ -139,7 +139,7 @@ impl Mapper for Mapper4 {
 
         self.data
             .chr_rom
-            .read(Page::Number(bank, PageSize::OneKb), address % 0x0400)
+            .read(Page::Number(bank, PageSizeKb::One), address % 0x0400)
     }
 
     fn write_chr_byte(&mut self, _: u16, _: u8) {}

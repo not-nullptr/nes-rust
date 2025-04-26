@@ -1,3 +1,6 @@
+extern crate alloc;
+extern crate core;
+
 #[macro_use]
 extern crate bitfield;
 
@@ -114,9 +117,9 @@ impl libretro_backend::Core for NesCore {
 
         let mut video_frame = [0u8; 256 * 240 * 4];
 
-        for i in 0..video_frame.len() {
+        for (i, frame) in video_frame.iter_mut().enumerate() {
             let pixel = self.cpu.bus.ppu.renderer.pixels[i / 4];
-            video_frame[i] = (pixel >> (i % 4 * 8)) as u8;
+            *frame = (pixel >> (i % 4 * 8)) as u8;
         }
 
         handle.upload_video_frame(&video_frame);
