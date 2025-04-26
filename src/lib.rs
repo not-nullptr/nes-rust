@@ -19,9 +19,9 @@ mod cpu;
 mod cpu_debug;
 mod ppu;
 
-use bus::Bus;
-use controller::Button;
-use cpu::Cpu;
+use crate::bus::Bus;
+use crate::controller::Button;
+use crate::cpu::Cpu;
 
 struct NesCore {
     game_data: Option<GameData>,

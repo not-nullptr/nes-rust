@@ -1,4 +1,4 @@
-use cartridge::Cartridge;
+use crate::cartridge::Cartridge;
 use std::cell::RefCell;
 use std::rc::Rc;
 

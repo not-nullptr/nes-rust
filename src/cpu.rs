@@ -1,7 +1,7 @@
-use bus::Bus;
+use crate::bus::Bus;
 use std::fmt::Write;
 
-use cpu_debug::{INSTRUCTION_NAMES, INSTRUCTION_SIZES};
+use crate::cpu_debug::{INSTRUCTION_NAMES, INSTRUCTION_SIZES};
 
 #[rustfmt::skip]
 enum Flag {

@@ -359,8 +359,8 @@ impl Renderer {
 #[cfg(test)]
 mod test {
     use super::*;
-    use cartridge::Cartridge;
-    use ppu::mask::Mask;
+    use crate::cartridge::Cartridge;
+    use crate::ppu::mask::Mask;
     use std::cell::RefCell;
     use std::rc::Rc;
 

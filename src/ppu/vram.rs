@@ -1,4 +1,4 @@
-use cartridge::{Cartridge, Mirroring};
+use crate::cartridge::{Cartridge, Mirroring};
 use std::cell::RefCell;
 use std::rc::Rc;
 

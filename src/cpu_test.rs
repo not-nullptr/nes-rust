@@ -1,7 +1,7 @@
 use super::Mode::*;
 use super::*;
 
-use cpu::Cpu;
+use crate::cpu::Cpu;
 
 macro_rules! build_cpu {
     ($bytes:expr) => {{
