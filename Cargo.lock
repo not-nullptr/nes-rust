@@ -54,31 +54,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "38f5c2b18a287cf78b4097db62e20f43cace381dc76ae5c0a3073067f78b7ddc"
 
 [[package]]
-name = "libretro-backend"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "667a71a6fdeec429bd88023eb7cc7b51264881b0cf9835431482a7c2f6e85d6e"
-dependencies = [
- "libc",
- "libretro-sys",
-]
-
-[[package]]
-name = "libretro-sys"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19465a3a0d54ad81f1abc5937971a36e6922c69d0ba612b78a35f83f32ce9ffe"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "nes"
 version = "0.1.0"
 dependencies = [
  "bitfield",
  "itertools",
- "libretro-backend",
  "rand",
  "time",
 ]
