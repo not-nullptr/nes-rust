@@ -56,7 +56,7 @@ impl Sprite {
         } else {
             control.sprite_tile_base() + self.tile_index.small_offset()
         };
-        // TODO: why mod sprite_height?
+        // TODO: why pub mod sprite_height?
         let mut y_offset = (scanline - self.y as usize) as u16 % control.sprite_height() as u16;
 
         if self.status.flip_y() {
@@ -80,7 +80,7 @@ impl Sprite {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

@@ -235,7 +235,7 @@ impl Mapper for Mapper1 {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

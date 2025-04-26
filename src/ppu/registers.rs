@@ -169,7 +169,7 @@ impl Registers {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
 
     use super::*;
 

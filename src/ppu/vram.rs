@@ -99,7 +99,7 @@ fn mirror_palette(address: u16) -> usize {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

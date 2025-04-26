@@ -359,7 +359,7 @@ impl Renderer {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
     use crate::cartridge::Cartridge;
     use crate::ppu::mask::Mask;

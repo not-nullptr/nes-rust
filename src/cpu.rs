@@ -1171,4 +1171,4 @@ fn high_byte(value: u16) -> u16 {
 
 #[cfg(test)]
 #[path = "./cpu_test.rs"]
-mod cpu_test;
+pub mod cpu_test;

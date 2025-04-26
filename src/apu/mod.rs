@@ -1,13 +1,13 @@
-mod dmc_channel;
-mod envelope;
-mod filter;
-mod frame_counter;
-mod length_counter;
-mod noise_channel;
-mod pulse_channel;
-mod sequencer;
-mod sweep;
-mod triangle_channel;
+pub mod dmc_channel;
+pub mod envelope;
+pub mod filter;
+pub mod frame_counter;
+pub mod length_counter;
+pub mod noise_channel;
+pub mod pulse_channel;
+pub mod sequencer;
+pub mod sweep;
+pub mod triangle_channel;
 
 use alloc::vec::Vec;
 

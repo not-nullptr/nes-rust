@@ -69,7 +69,7 @@ impl Pager {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     fn build_pager() -> Pager {

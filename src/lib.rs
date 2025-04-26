@@ -14,13 +14,13 @@ use libretro_backend::{
 extern crate rand;
 extern crate time;
 
-mod apu;
-mod bus;
-mod cartridge;
-mod controller;
-mod cpu;
-mod cpu_debug;
-mod ppu;
+pub mod apu;
+pub mod bus;
+pub mod cartridge;
+pub mod controller;
+pub mod cpu;
+pub mod cpu_debug;
+pub mod ppu;
 
 use crate::bus::Bus;
 use crate::controller::Button;

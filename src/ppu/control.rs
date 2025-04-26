@@ -13,11 +13,7 @@ bitfield! {
 
 impl Control {
     pub fn sprite_height(&self) -> u8 {
-        if self.large_sprites() {
-            16
-        } else {
-            8
-        }
+        if self.large_sprites() { 16 } else { 8 }
     }
     pub fn sprite_tile_base(&self) -> u16 {
         self.sprite_table() as u16 * 0x1000
@@ -28,16 +24,12 @@ impl Control {
     }
 
     pub fn increment_amount(&self) -> u16 {
-        if self.vertical_increment() {
-            32
-        } else {
-            1
-        }
+        if self.vertical_increment() { 32 } else { 1 }
     }
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

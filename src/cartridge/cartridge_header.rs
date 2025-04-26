@@ -61,7 +61,7 @@ impl CartridgeHeader {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     const HEADER: [u8; 16] = [

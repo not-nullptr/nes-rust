@@ -1,12 +1,12 @@
-mod address;
-mod colors;
-mod control;
-mod mask;
-mod registers;
-mod renderer;
+pub mod address;
+pub mod colors;
+pub mod control;
+pub mod mask;
+pub mod registers;
+pub mod renderer;
 pub mod result;
-mod sprite;
-mod status;
+pub mod sprite;
+pub mod status;
 pub mod vram;
 
 use self::registers::Registers;

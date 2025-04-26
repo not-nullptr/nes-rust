@@ -203,4 +203,4 @@ impl Bus {
 }
 
 #[cfg(test)]
-mod test {}
+pub mod test {}

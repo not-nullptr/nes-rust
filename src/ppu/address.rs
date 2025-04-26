@@ -78,7 +78,7 @@ impl Address {
 }
 
 #[cfg(test)]
-mod test {
+pub mod test {
     use super::*;
 
     #[test]

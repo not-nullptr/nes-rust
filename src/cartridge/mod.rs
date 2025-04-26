@@ -1,12 +1,12 @@
-mod cartridge_data;
-mod cartridge_header;
-mod mapper;
-mod mapper0;
-mod mapper1;
-mod mapper2;
-mod mapper3;
-mod mapper4;
-mod pager;
+pub mod cartridge_data;
+pub mod cartridge_header;
+pub mod mapper;
+pub mod mapper0;
+pub mod mapper1;
+pub mod mapper2;
+pub mod mapper3;
+pub mod mapper4;
+pub mod pager;
 
 use alloc::boxed::Box;
 
@@ -75,7 +75,7 @@ impl Cartridge {
 }
 
 #[cfg(test)]
-mod ppu_test {
+pub mod ppu_test {
     use super::*;
     fn build_cartridge(chr_ram: bool) -> Cartridge {
         let mut data = ::alloc::vec![
