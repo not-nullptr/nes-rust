@@ -1,6 +1,6 @@
 use crate::cartridge::{Cartridge, Mirroring};
-use std::cell::RefCell;
-use std::rc::Rc;
+use core::cell::RefCell;
+use core::rc::Rc;
 
 const NAMETABLE_SIZE: usize = 0x400;
 const PALETTE_SIZE: usize = 0x20;

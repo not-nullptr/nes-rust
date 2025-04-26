@@ -1,5 +1,5 @@
 use crate::bus::Bus;
-use std::fmt::Write;
+use core::fmt::Write;
 
 use crate::cpu_debug::{INSTRUCTION_NAMES, INSTRUCTION_SIZES};
 

@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use core::f64::consts::PI;
 
 pub struct FirstOrderFilter {
     b0: f64,

@@ -1,6 +1,6 @@
 use crate::cartridge::Cartridge;
-use std::cell::RefCell;
-use std::rc::Rc;
+use alloc::rc::Rc;
+use core::cell::RefCell;
 
 #[rustfmt::skip]
 pub const PERIODS: [u8; 16] = [

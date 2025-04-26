@@ -1,8 +1,8 @@
+use super::PpuResult;
+use super::Registers;
 use super::colors::RGB;
 use super::nth_bit;
 use super::sprite::Sprite;
-use super::PpuResult;
-use super::Registers;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BitPlane<T> {
@@ -361,8 +361,8 @@ mod test {
     use super::*;
     use crate::cartridge::Cartridge;
     use crate::ppu::mask::Mask;
-    use std::cell::RefCell;
-    use std::rc::Rc;
+    use core::cell::RefCell;
+    use core::rc::Rc;
 
     #[test]
     fn test_evaluate_sprites() {

@@ -1,5 +1,5 @@
 use super::Mirroring;
-use std::ops::Range;
+use core::ops::Range;
 
 const PRG_ROM_PAGE_SIZE: usize = 0x4000;
 const PRG_RAM_PAGE_SIZE: usize = 0x2000;

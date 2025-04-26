@@ -12,7 +12,7 @@ rand = "0.3"
 time = "0.1"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["lib"]
 
 [features]
 log = []
