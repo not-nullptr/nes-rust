@@ -26,7 +26,7 @@ use crate::bus::Bus;
 use crate::controller::Button;
 use crate::cpu::Cpu;
 
-struct NesCore {
+pub struct NesCore {
     game_data: Option<GameData>,
     cpu: Cpu,
     frame_count: i32,
