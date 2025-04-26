@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 #[derive(Copy, Clone, Debug)]
 pub enum PageSizeKb {
     One = 0x400,

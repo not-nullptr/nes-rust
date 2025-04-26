@@ -9,6 +9,8 @@ mod sequencer;
 mod sweep;
 mod triangle_channel;
 
+use alloc::vec::Vec;
+
 use self::dmc_channel::DmcChannel;
 use self::envelope::Envelope;
 use self::filter::FirstOrderFilter;

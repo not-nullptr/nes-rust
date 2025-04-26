@@ -8,6 +8,8 @@ mod mapper3;
 mod mapper4;
 mod pager;
 
+use alloc::boxed::Box;
+
 use self::cartridge_data::CartridgeData;
 use self::mapper::Mapper;
 use self::mapper0::Mapper0;
@@ -76,7 +78,7 @@ impl Cartridge {
 mod ppu_test {
     use super::*;
     fn build_cartridge(chr_ram: bool) -> Cartridge {
-        let mut data = vec![
+        let mut data = ::alloc::vec![
             0x4e,
             0x45,
             0x53,

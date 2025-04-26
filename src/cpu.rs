@@ -1,7 +1,4 @@
 use crate::bus::Bus;
-use core::fmt::Write;
-
-use crate::cpu_debug::{INSTRUCTION_NAMES, INSTRUCTION_SIZES};
 
 #[rustfmt::skip]
 enum Flag {
@@ -215,10 +212,10 @@ impl Cpu {
 
     fn interrupt(&mut self, kind: Interrupt) {
         let (ticks, push, address, flags) = match kind {
-            Interrupt::Nmi => (2, true, 0xFFFAu16, vec![Flag::IrqDisable]),
-            Interrupt::Reset => (5, false, 0xFFFCu16, vec![]),
-            Interrupt::Irq => (2, true, 0xFFFEu16, vec![Flag::IrqDisable]),
-            Interrupt::Break => (1, true, 0xFFFEu16, vec![Flag::IrqDisable]),
+            Interrupt::Nmi => (2, true, 0xFFFAu16, ::alloc::vec![Flag::IrqDisable]),
+            Interrupt::Reset => (5, false, 0xFFFCu16, ::alloc::vec![]),
+            Interrupt::Irq => (2, true, 0xFFFEu16, ::alloc::vec![Flag::IrqDisable]),
+            Interrupt::Break => (1, true, 0xFFFEu16, ::alloc::vec![Flag::IrqDisable]),
         };
 
         for _ in 0..ticks {
@@ -242,30 +239,6 @@ impl Cpu {
         }
 
         self.pc = self.bus.read_word(address);
-    }
-
-    #[allow(dead_code)]
-    pub fn log_next_instruction(&mut self) {
-        let pc = self.pc;
-        let rom_offset = 15 + (self.pc % 0x4000);
-        let opcode = self.bus.unclocked_read_byte(pc) as usize;
-        let mut args = String::new();
-        for i in 1..INSTRUCTION_SIZES[opcode] {
-            write!(&mut args, "{:02X} ", self.bus.unclocked_read_byte(pc + i)).expect("it to work");
-        }
-        println!(
-            "OFFSET:{:06x}\tPC:{:04x}\tA:{:02x}\tX:{:02x}\tY:{:02x}\tP:{:08b}\tTEST:{:02x}\t[{:02x}] {}\t{}",
-            rom_offset,
-            pc,
-            self.a,
-            self.x,
-            self.y,
-            self.p,
-            self.bus.unclocked_read_byte(0x6000),
-            opcode,
-            INSTRUCTION_NAMES[opcode],
-            args,
-        );
     }
 
     pub fn execute_next_instruction(&mut self) {
@@ -562,8 +535,6 @@ impl Cpu {
             0x9e => self.shx(),
             0x9b => self.tas(Mode::AbsoluteY),
             0xbb => self.las(Mode::AbsoluteY),
-
-            0x02 => println!("----------------PING----------------------"),
 
             _ => panic!("unimplemented or illegal instruction: 0x{:X}", opcode),
         }

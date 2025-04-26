@@ -5,7 +5,7 @@ use crate::cpu::Cpu;
 
 macro_rules! build_cpu {
     ($bytes:expr_2021) => {{
-        let mut rom = vec![
+        let mut rom = ::alloc::vec![
             0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x00, // Zero pages CHR-ROM means use CHR-RAM
             0x01, // Vertical mirroring
@@ -31,7 +31,7 @@ macro_rules! test_op {
     ($instruction:expr_2021, $mode:ident, [$($b:expr_2021),*]{$($sk:ident : $sv:expr_2021),*} => [$($rb:expr_2021),*]{$($ek:ident : $ev:expr_2021),*}) => {
         {
             let op = opcode($instruction, $mode);
-            let mut mem = vec![$($b),*];
+            let mut mem = ::alloc::vec![$($b),*];
             mem.insert(0, op.code);
             let mut cpu = build_cpu!(mem);
             let start_pc = cpu.pc;
@@ -49,7 +49,7 @@ macro_rules! test_op {
             $(
                 assert!(cpu.$ek==$ev, "Incorrect Register. Expected cpu.{} to be {}, got {}", stringify!($ek), stringify!($ev), cpu.$ek);
             )*
-            let mut mem = vec![$($rb),*];
+            let mut mem = ::alloc::vec![$($rb),*];
             mem.insert(0, op.code);
             for (i, &b) in mem.iter().enumerate() {
                 assert!(cpu.bus.ram[i]==b, "Incorrect Memory. Expected ram[{}] to be {}, got {}", i, b, cpu.bus.ram[i]);

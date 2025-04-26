@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use super::PpuResult;
 use super::Registers;
 use super::colors::RGB;
@@ -48,7 +50,7 @@ impl Renderer {
     }
 
     pub fn clear_pixels(&mut self) {
-        self.pixels = vec![0; self.pixels.capacity()]
+        self.pixels = ::alloc::vec![0; self.pixels.capacity()]
     }
 
     pub fn reset(&mut self) {
@@ -361,8 +363,8 @@ mod test {
     use super::*;
     use crate::cartridge::Cartridge;
     use crate::ppu::mask::Mask;
+    use alloc::rc::Rc;
     use core::cell::RefCell;
-    use core::rc::Rc;
 
     #[test]
     fn test_evaluate_sprites() {
@@ -396,7 +398,7 @@ mod test {
     }
 
     fn build_cartridge() -> Rc<RefCell<Cartridge>> {
-        let mut data = vec![
+        let mut data = ::alloc::vec![
             0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x00, // Zero pages CHR-ROM means use CHR-RAM
             0x00, 0x00, 0x01, // One page of PRG-RAM

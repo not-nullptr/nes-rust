@@ -3,8 +3,8 @@ use crate::cartridge::Cartridge;
 use crate::controller::Controller;
 use crate::ppu::Ppu;
 use crate::ppu::result::PpuResult;
+use alloc::rc::Rc;
 use core::cell::RefCell;
-use core::rc::Rc;
 
 pub struct Interrupt {
     schedule: Option<u8>,

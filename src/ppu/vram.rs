@@ -1,6 +1,6 @@
 use crate::cartridge::{Cartridge, Mirroring};
+use alloc::rc::Rc;
 use core::cell::RefCell;
-use core::rc::Rc;
 
 const NAMETABLE_SIZE: usize = 0x400;
 const PALETTE_SIZE: usize = 0x20;
@@ -136,7 +136,7 @@ mod test {
     }
 
     fn build_cartridge() -> Rc<RefCell<Cartridge>> {
-        let mut data = vec![
+        let mut data = ::alloc::vec![
             0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x01, // One page of CHR-ROM
             0x00, 0x00, 0x01, // One page of PRG-RAM

@@ -6,8 +6,6 @@ extern crate core;
 #[macro_use]
 extern crate bitfield;
 
-#[macro_use]
-extern crate libretro_backend;
 use libretro_backend::{
     AudioVideoInfo, CoreInfo, GameData, JoypadButton, LoadGameResult, PixelFormat, Region,
     RuntimeHandle,
@@ -143,5 +141,3 @@ impl libretro_backend::Core for NesCore {
         self.cpu.reset();
     }
 }
-
-libretro_core!(NesCore);

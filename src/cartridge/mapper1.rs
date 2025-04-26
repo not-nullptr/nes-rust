@@ -262,7 +262,7 @@ mod test {
     }
 
     fn build_cartridge_data() -> CartridgeData {
-        let mut data = vec![
+        let mut data = ::alloc::vec![
             0x4e, 0x45, 0x53, 0x1a, 0x0F, // 16 x 16kb prg rom
             0x0F, // 16 x 8kb chr rom
             0x00, 0x00, 0x01, // One page of PRG-RAM
