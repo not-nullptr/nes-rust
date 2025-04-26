@@ -1,7 +1,7 @@
-use super::{Sweep, SweepNegationMode};
 use super::Envelope;
 use super::LengthCounter;
 use super::Sequencer;
+use super::{Sweep, SweepNegationMode};
 
 pub const PULSE_WAVEFORMS: [[u8; 8]; 4] = [
     [0, 1, 0, 0, 0, 0, 0, 0],
@@ -51,7 +51,8 @@ impl PulseChannel {
 
     pub fn sample(&self) -> u8 {
         // TODO: removing the target period check makes arkanoid sound effects work
-        if self.length_counter.active() && self.sequencer.period >= 8
+        if self.length_counter.active()
+            && self.sequencer.period >= 8
             && self.sweep.target_period(&self.sequencer) < 0x800
         {
             PULSE_WAVEFORMS[self.duty_cycle][self.sequencer.current_step] * self.envelope.volume()

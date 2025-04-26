@@ -11,7 +11,7 @@ pub const INSTRUCTION_SIZES: [u16; 256] = [
 ];
 
 #[allow(dead_code)]
-pub const INSTRUCTION_NAMES: [&'static str; 256] = [
+pub const INSTRUCTION_NAMES: [&str; 256] = [
     "BRK", "ORA izx", "*KIL", "*SLO izx", "*NOP zp", "ORA zp", "ASL zp", "*SLO zp", "PHP",
     "ORA imm", "ASL", "*ANC imm", "*NOP abs", "ORA abs", "ASL abs", "*SLO abs", "BPL rel",
     "ORA izy", "*KIL", "*SLO izy", "*NOP zpx", "ORA zpx", "ASL zpx", "*SLO zpx", "CLC", "ORA aby",

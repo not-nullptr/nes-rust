@@ -1,12 +1,12 @@
-mod pager;
-mod cartridge_header;
 mod cartridge_data;
+mod cartridge_header;
 mod mapper;
 mod mapper0;
 mod mapper1;
 mod mapper2;
 mod mapper3;
 mod mapper4;
+mod pager;
 
 use self::cartridge_data::CartridgeData;
 use self::mapper::Mapper;
@@ -24,14 +24,14 @@ pub enum Mirroring {
 }
 
 pub struct Cartridge {
-    mapper: Box<Mapper>,
+    mapper: Box<dyn Mapper>,
 }
 
 impl Cartridge {
     pub fn new(data: &[u8]) -> Self {
         let data = CartridgeData::new(data);
 
-        let mapper: Box<Mapper> = match data.header.mapper_number {
+        let mapper: Box<dyn Mapper> = match data.header.mapper_number {
             0 => Box::new(Mapper0::new(data)),
             1 => Box::new(Mapper1::new(data)),
             2 => Box::new(Mapper2::new(data)),
@@ -40,7 +40,7 @@ impl Cartridge {
             n => panic!("Mapper {} not implemented", n),
         };
 
-        Cartridge { mapper: mapper }
+        Cartridge { mapper }
     }
 
     pub fn signal_scanline(&mut self) {

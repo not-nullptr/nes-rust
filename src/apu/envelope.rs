@@ -1,4 +1,4 @@
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone, PartialEq)]
     pub struct EnvelopeControl(u8);
     impl Debug;
@@ -29,17 +29,13 @@ impl Envelope {
         if self.start {
             self.start = false;
             self.set_level(0x0f);
-        } else {
-            if self.counter > 0 {
-                self.counter -= 1;
-            } else {
-                if self.level > 0 {
-                    let l = self.level - 1;
-                    self.set_level(l);
-                } else if self.control.looping() {
-                    self.set_level(0x0f);
-                }
-            }
+        } else if self.counter > 0 {
+            self.counter -= 1;
+        } else if self.level > 0 {
+            let l = self.level - 1;
+            self.set_level(l);
+        } else if self.control.looping() {
+            self.set_level(0x0f);
         }
     }
 

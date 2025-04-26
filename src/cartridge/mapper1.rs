@@ -1,11 +1,11 @@
 // Mapper1 implements ines mapper 1 (MMC1)
 // https://wiki.nesdev.com/w/index.php/MMC1
 
+use super::pager::Page;
+use super::pager::PageSize;
 use super::CartridgeData;
 use super::Mapper;
 use super::Mirroring;
-use super::pager::Page;
-use super::pager::PageSize;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 enum AddressRange {
@@ -26,7 +26,7 @@ enum ChrMode {
     NonConsecutive,
 }
 
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone)]
     struct ControlRegister(u8);
     impl Debug;
@@ -119,10 +119,10 @@ impl Mapper1 {
     fn write_shift(&mut self, address: u16, value: u8) {
         if let Some(shift_value) = self.shift.push(value) {
             match address {
-                0x8000...0x9FFF => self.control = ControlRegister(shift_value),
-                0xA000...0xBFFF => self.chr_0 = shift_value as usize & 0b1_1111,
-                0xC000...0xDFFF => self.chr_1 = shift_value as usize & 0b1_1111,
-                0xE000...0xFFFF => self.prg_0 = shift_value as usize & 0b1111,
+                0x8000..=0x9FFF => self.control = ControlRegister(shift_value),
+                0xA000..=0xBFFF => self.chr_0 = shift_value as usize & 0b1_1111,
+                0xC000..=0xDFFF => self.chr_1 = shift_value as usize & 0b1_1111,
+                0xE000..=0xFFFF => self.prg_0 = shift_value as usize & 0b1111,
                 _ => panic!("Invalid address"),
             }
         }
@@ -195,33 +195,33 @@ impl Mapper1 {
 impl Mapper for Mapper1 {
     fn read_prg_byte(&self, address: u16) -> u8 {
         match address {
-            0x6000...0x7FFF => self.read_paged_prg_ram(address - 0x6000),
-            0x8000...0xBFFF => self.read_paged_prg_rom(AddressRange::Low, address - 0x8000),
-            0xC000...0xFFFF => self.read_paged_prg_rom(AddressRange::High, address - 0xC000),
+            0x6000..=0x7FFF => self.read_paged_prg_ram(address - 0x6000),
+            0x8000..=0xBFFF => self.read_paged_prg_rom(AddressRange::Low, address - 0x8000),
+            0xC000..=0xFFFF => self.read_paged_prg_rom(AddressRange::High, address - 0xC000),
             _ => panic!("bad address"),
         }
     }
 
     fn write_prg_byte(&mut self, address: u16, value: u8) {
         match address {
-            0x6000...0x7FFF => self.write_paged_prg_ram(address - 0x6000, value),
-            0x8000...0xFFFF => self.write_shift(address, value),
+            0x6000..=0x7FFF => self.write_paged_prg_ram(address - 0x6000, value),
+            0x8000..=0xFFFF => self.write_shift(address, value),
             _ => panic!("bad address"),
         }
     }
 
     fn read_chr_byte(&self, address: u16) -> u8 {
         match address {
-            0x0000...0x0FFF => self.read_paged_chr_rom(AddressRange::Low, address),
-            0x1000...0x1FFF => self.read_paged_chr_rom(AddressRange::High, address - 0x1000),
+            0x0000..=0x0FFF => self.read_paged_chr_rom(AddressRange::Low, address),
+            0x1000..=0x1FFF => self.read_paged_chr_rom(AddressRange::High, address - 0x1000),
             _ => panic!("bad address"),
         }
     }
 
     fn write_chr_byte(&mut self, address: u16, value: u8) {
         match address {
-            0x0000...0x0FFF => self.write_paged_chr_ram(AddressRange::Low, address, value),
-            0x1000...0x1FFF => {
+            0x0000..=0x0FFF => self.write_paged_chr_ram(AddressRange::Low, address, value),
+            0x1000..=0x1FFF => {
                 self.write_paged_chr_ram(AddressRange::High, address - 0x1000, value)
             }
             _ => panic!("bad address"),
@@ -263,22 +263,10 @@ mod test {
 
     fn build_cartridge_data() -> CartridgeData {
         let mut data = vec![
-            0x4e,
-            0x45,
-            0x53,
-            0x1a,
-            0x0F, // 16 x 16kb prg rom
+            0x4e, 0x45, 0x53, 0x1a, 0x0F, // 16 x 16kb prg rom
             0x0F, // 16 x 8kb chr rom
-            0x00,
-            0x00,
-            0x01, // One page of PRG-RAM
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
+            0x00, 0x00, 0x01, // One page of PRG-RAM
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
         // add the PRG-ROM
@@ -387,5 +375,4 @@ mod test {
         mapper.data.chr_rom.data[PageSize::FourKb as usize * 5 + 9] = 0xFD;
         assert_eq!(mapper.read_chr_byte(0x1009), 0xFD);
     }
-
 }

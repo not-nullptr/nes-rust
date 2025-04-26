@@ -1,63 +1,46 @@
-use super::*;
 use super::Mode::*;
-use apu::Apu;
+use super::*;
 
 use cpu::Cpu;
-use ppu::Ppu;
 
 macro_rules! build_cpu {
-    ($bytes:expr) => {
-        {
-            let mut rom = vec![
-                    0x4e,
-                    0x45,
-                    0x53,
-                    0x1a,
-                    0x02, // Two pages of PRG-ROM
-                    0x00, // Zero pages CHR-ROM means use CHR-RAM
-                    0x01, // Vertical mirroring
-                    0x00,
-                    0x01, // One page of PRG-RAM
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                    0x00,
-                ];
+    ($bytes:expr) => {{
+        let mut rom = vec![
+            0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
+            0x00, // Zero pages CHR-ROM means use CHR-RAM
+            0x01, // Vertical mirroring
+            0x00, 0x01, // One page of PRG-RAM
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        ];
 
-            // add the PRG-ROM
-            rom.extend_from_slice(&[0u8; 2 * 0x4000]);
-            let mut bus = Bus::new();
-            bus.load_rom_from_memory(&rom);
-            let mut cpu = Cpu::new(bus);
-            cpu.pc = 0;
-            let bytes = $bytes;
-            for (i, &b) in bytes.iter().enumerate() {
-                cpu.bus.ram[i] = b as u8;
-            }
-            cpu
+        // add the PRG-ROM
+        rom.extend_from_slice(&[0u8; 2 * 0x4000]);
+        let mut bus = Bus::new();
+        bus.load_rom_from_memory(&rom);
+        let mut cpu = Cpu::new(bus);
+        cpu.pc = 0;
+        let bytes = $bytes;
+        for (i, &b) in bytes.iter().enumerate() {
+            cpu.bus.ram[i] = b as u8;
         }
-    }
+        cpu
+    }};
 }
 macro_rules! build_cpu_and_run {
-    ($instruction:expr, $mode:ident, $bytes:expr) => {
-        {
-            let op = opcode($instruction, $mode);
-            let mut mem = $bytes;
-            mem.insert(0, op.code);
-            let mut cpu = build_cpu!(mem);
-            let start_pc = cpu.pc;
-            let start_cycles = cpu.bus.cycles;
-            let start_p = cpu.p;
-            cpu.execute_next_instruction();
-            assert_eq!(0, cpu.p & start_p & !op.mask);
-            assert_eq!(op.size, cpu.pc - start_pc);
-            assert_eq!(op.cycles, cpu.bus.cycles - start_cycles);
-            cpu
-        }
-    }
+    ($instruction:expr, $mode:ident, $bytes:expr) => {{
+        let op = opcode($instruction, $mode);
+        let mut mem = $bytes;
+        mem.insert(0, op.code);
+        let mut cpu = build_cpu!(mem);
+        let start_pc = cpu.pc;
+        let start_cycles = cpu.bus.cycles;
+        let start_p = cpu.p;
+        cpu.execute_next_instruction();
+        assert_eq!(0, cpu.p & start_p & !op.mask);
+        assert_eq!(op.size, cpu.pc - start_pc);
+        assert_eq!(op.cycles, cpu.bus.cycles - start_cycles);
+        cpu
+    }};
 }
 
 macro_rules! test_op {

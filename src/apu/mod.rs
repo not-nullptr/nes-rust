@@ -1,13 +1,13 @@
+mod dmc_channel;
+mod envelope;
+mod filter;
 mod frame_counter;
 mod length_counter;
-mod envelope;
-mod pulse_channel;
-mod triangle_channel;
 mod noise_channel;
-mod dmc_channel;
-mod filter;
+mod pulse_channel;
 mod sequencer;
 mod sweep;
+mod triangle_channel;
 
 use self::dmc_channel::DmcChannel;
 use self::envelope::Envelope;
@@ -87,11 +87,11 @@ impl Apu {
 
     pub fn write_register(&mut self, address: u16, value: u8, cycles: u64) {
         match address {
-            0x4000...0x4003 => self.pulse_0.write_register(address, value),
-            0x4004...0x4007 => self.pulse_1.write_register(address, value),
-            0x4008...0x400B => self.triangle.write_register(address, value),
-            0x400C...0x400F => self.noise.write_register(address, value),
-            0x4010...0x4013 => self.dmc.write_register(address, value),
+            0x4000..=0x4003 => self.pulse_0.write_register(address, value),
+            0x4004..=0x4007 => self.pulse_1.write_register(address, value),
+            0x4008..=0x400B => self.triangle.write_register(address, value),
+            0x400C..=0x400F => self.noise.write_register(address, value),
+            0x4010..=0x4013 => self.dmc.write_register(address, value),
             0x4015 => {
                 self.pulse_0.set_enabled(value & 0b0000_0001 != 0);
                 self.pulse_1.set_enabled(value & 0b0000_0010 != 0);

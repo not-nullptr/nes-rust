@@ -1,8 +1,8 @@
-use super::PpuResult;
-use super::Registers;
 use super::colors::RGB;
 use super::nth_bit;
 use super::sprite::Sprite;
+use super::PpuResult;
+use super::Registers;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct BitPlane<T> {
@@ -62,7 +62,7 @@ impl Renderer {
 
     pub fn tick(&mut self, registers: &mut Registers) -> PpuResult {
         let mut r = match (self.scanline, self.dot) {
-            (0...239, _) => {
+            (0..=239, _) => {
                 self.tick_sprites(false, registers);
                 self.tick_pixel(registers);
                 self.tick_background(false, registers);
@@ -120,7 +120,7 @@ impl Renderer {
 
     fn tick_pixel(&mut self, registers: &mut Registers) {
         match self.dot {
-            2...257 | 322...337 => {
+            2..=257 | 322..=337 => {
                 let x = self.dot - 2;
                 let y = self.scanline;
                 if let Some(color) = self.render_pixel(x, y, registers) {
@@ -134,7 +134,7 @@ impl Renderer {
 
     fn tick_background(&mut self, pre: bool, registers: &mut Registers) {
         match self.dot {
-            2...255 | 322...337 => match self.dot % 8 {
+            2..=255 | 322..=337 => match self.dot % 8 {
                 1 => {
                     self.scratch_address = registers.v_address.nametable_address();
                     self.reload_shift_registers();
@@ -185,11 +185,11 @@ impl Renderer {
                     registers.v_address.copy_x(registers.t_address);
                 }
             }
-            280...304 => if pre {
-                if registers.mask.rendering() {
+            280..=304 => {
+                if pre && registers.mask.rendering() {
                     registers.v_address.copy_y(registers.t_address);
                 }
-            },
+            }
             1 => {
                 self.scratch_address = registers.v_address.nametable_address();
                 if pre {
@@ -252,7 +252,8 @@ impl Renderer {
 
         if r != 0 {
             r |= (nth_bit(self.attribute_shift.high, 7 - registers.fine_x) << 1
-                | nth_bit(self.attribute_shift.low, 7 - registers.fine_x)) << 2;
+                | nth_bit(self.attribute_shift.low, 7 - registers.fine_x))
+                << 2;
         }
         r
     }
@@ -358,10 +359,10 @@ impl Renderer {
 #[cfg(test)]
 mod test {
     use super::*;
+    use cartridge::Cartridge;
+    use ppu::mask::Mask;
     use std::cell::RefCell;
     use std::rc::Rc;
-    use ppu::mask::Mask;
-    use cartridge::Cartridge;
 
     #[test]
     fn test_evaluate_sprites() {
@@ -386,32 +387,20 @@ mod test {
         }
         renderer.eval_sprites(&mut regs);
         assert_eq!(renderer.secondary_oam.len(), 8);
-        assert_eq!(regs.status.sprite_overflow(), false);
+        assert!(!regs.status.sprite_overflow());
 
         regs.oam_ram[8 * 4] = 10;
         renderer.eval_sprites(&mut regs);
         assert_eq!(renderer.secondary_oam.len(), 8);
-        assert_eq!(regs.status.sprite_overflow(), true);
+        assert!(regs.status.sprite_overflow());
     }
 
     fn build_cartridge() -> Rc<RefCell<Cartridge>> {
         let mut data = vec![
-            0x4e,
-            0x45,
-            0x53,
-            0x1a,
-            0x02, // Two pages of PRG-ROM
+            0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x00, // Zero pages CHR-ROM means use CHR-RAM
-            0x00,
-            0x00,
-            0x01, // One page of PRG-RAM
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
+            0x00, 0x00, 0x01, // One page of PRG-RAM
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
         // add the PRG-ROM
@@ -477,7 +466,7 @@ mod test {
         renderer.step();
         assert_eq!(renderer.dot, 0);
         assert_eq!(renderer.scanline, 0);
-        assert_eq!(renderer.odd_frame, true);
+        assert!(renderer.odd_frame);
     }
 
     #[test]
@@ -590,7 +579,7 @@ mod test {
             (0, false, false)
         );
         assert_eq!(renderer.render_pixel(0, 0, &mut regs), Some(0b11));
-        assert_eq!(regs.status.sprite_zero_hit(), false);
+        assert!(!regs.status.sprite_zero_hit());
     }
 
     #[test]
@@ -612,7 +601,7 @@ mod test {
         );
 
         assert_eq!(renderer.render_pixel(0, 0, &mut regs), Some(0b1_00_01));
-        assert_eq!(regs.status.sprite_zero_hit(), true);
+        assert!(regs.status.sprite_zero_hit());
     }
 
     #[test]
@@ -633,7 +622,6 @@ mod test {
             (0b1_00_01, true, true)
         );
         assert_eq!(renderer.render_pixel(0, 0, &mut regs), Some(0b11));
-        assert_eq!(regs.status.sprite_zero_hit(), true);
+        assert!(regs.status.sprite_zero_hit());
     }
-
 }

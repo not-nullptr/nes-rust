@@ -1,4 +1,4 @@
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone)]
     pub struct Control(u8);
     impl Debug;

@@ -1,8 +1,8 @@
 use apu::Apu;
 use cartridge::Cartridge;
 use controller::Controller;
-use ppu::Ppu;
 use ppu::result::PpuResult;
+use ppu::Ppu;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -16,11 +16,10 @@ impl Interrupt {
     }
 
     fn tick(&mut self) {
-        match self.schedule.as_mut() {
-            Some(v) => if *v > 0 {
+        if let Some(v) = self.schedule.as_mut() {
+            if *v > 0 {
                 *v -= 1
-            },
-            None => (),
+            }
         };
     }
 
@@ -78,25 +77,27 @@ impl Bus {
     // unclocked_read_byte and unclocked_write_byte are unclocked memory access
     pub fn unclocked_read_byte(&mut self, address: u16) -> u8 {
         match address {
-            0...0x1FFF => self.ram[address as usize % 0x0800],
-            0x2000...0x3FFF => self.ppu.read_register(address),
+            0..=0x1FFF => self.ram[address as usize % 0x0800],
+            0x2000..=0x3FFF => self.ppu.read_register(address),
             0x4015 => self.apu.read_register(),
             0x4016 => self.controller_0.read_register(),
             0x4017 => self.controller_1.read_register(),
-            0x4018...0xFFFF => if let Some(ref c) = self.cartridge {
-                c.borrow().read_prg_byte(address)
-            } else {
-                (address >> 8) as u8
-            },
+            0x4018..=0xFFFF => {
+                if let Some(ref c) = self.cartridge {
+                    c.borrow().read_prg_byte(address)
+                } else {
+                    (address >> 8) as u8
+                }
+            }
             address => (address >> 8) as u8,
         }
     }
 
     fn unclocked_write_byte(&mut self, address: u16, value: u8) {
         match address {
-            0...0x1FFF => self.ram[address as usize % 0x0800] = value,
-            0x2000...0x3FFF => self.ppu.write_register(address, value),
-            0x4000...0x4013 | 0x4015 => self.apu.write_register(address, value, self.cycles),
+            0..=0x1FFF => self.ram[address as usize % 0x0800] = value,
+            0x2000..=0x3FFF => self.ppu.write_register(address, value),
+            0x4000..=0x4013 | 0x4015 => self.apu.write_register(address, value, self.cycles),
             0x4017 => self.apu.write_register(address, value, self.cycles),
             0x4014 => self.oam_dma(value as u16),
             0x4016 => {
@@ -104,9 +105,11 @@ impl Bus {
                 self.controller_1.write_register(value);
             }
 
-            0x4018...0xFFFF => if let Some(ref c) = self.cartridge {
-                c.borrow_mut().write_prg_byte(address, value);
-            },
+            0x4018..=0xFFFF => {
+                if let Some(ref c) = self.cartridge {
+                    c.borrow_mut().write_prg_byte(address, value);
+                }
+            }
             _ => (),
         }
     }
@@ -175,9 +178,11 @@ impl Bus {
             PpuResult::Nmi => {
                 self.nmi.schedule(1);
             }
-            PpuResult::Scanline => if let Some(ref c) = self.cartridge {
-                c.borrow_mut().signal_scanline();
-            },
+            PpuResult::Scanline => {
+                if let Some(ref c) = self.cartridge {
+                    c.borrow_mut().signal_scanline();
+                }
+            }
             PpuResult::Draw => {
                 self.draw = true;
             }
@@ -199,6 +204,4 @@ impl Bus {
 }
 
 #[cfg(test)]
-mod test {
-    use super::*;
-}
+mod test {}

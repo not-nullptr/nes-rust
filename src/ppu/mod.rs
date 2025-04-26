@@ -1,13 +1,13 @@
 mod address;
-mod control;
 mod colors;
+mod control;
 mod mask;
+mod registers;
+mod renderer;
+pub mod result;
 mod sprite;
 mod status;
 pub mod vram;
-mod renderer;
-mod registers;
-pub mod result;
 
 use self::registers::Registers;
 use self::renderer::Renderer;

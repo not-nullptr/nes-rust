@@ -3,23 +3,25 @@ extern crate bitfield;
 
 #[macro_use]
 extern crate libretro_backend;
-use libretro_backend::{AudioVideoInfo, CoreInfo, GameData, JoypadButton, LoadGameResult,
-                       PixelFormat, Region, RuntimeHandle};
+use libretro_backend::{
+    AudioVideoInfo, CoreInfo, GameData, JoypadButton, LoadGameResult, PixelFormat, Region,
+    RuntimeHandle,
+};
 
 extern crate rand;
 extern crate time;
 
-mod cpu;
-mod cpu_debug;
 mod apu;
-mod ppu;
 mod bus;
 mod cartridge;
 mod controller;
+mod cpu;
+mod cpu_debug;
+mod ppu;
 
 use bus::Bus;
-use cpu::Cpu;
 use controller::Button;
+use cpu::Cpu;
 
 struct NesCore {
     game_data: Option<GameData>,

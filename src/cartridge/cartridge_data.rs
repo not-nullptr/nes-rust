@@ -14,7 +14,7 @@ impl CartridgeData {
         let header = CartridgeHeader::new(data);
 
         CartridgeData {
-            header: header,
+            header,
             prg_rom: Pager::new(data[header.prg_rom_range()].to_vec()),
             chr_rom: Pager::new(data[header.chr_rom_range()].to_vec()),
             prg_ram: Pager::new(vec![0u8; header.prg_ram_bytes()]),

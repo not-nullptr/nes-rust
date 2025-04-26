@@ -76,7 +76,7 @@ impl Registers {
             5 => self.open_bus,
             6 => self.open_bus,
             7 => {
-                if let 0x3f00...0x3fff = self.v_address.address() {
+                if let 0x3f00..=0x3fff = self.v_address.address() {
                     self.read_data() | (self.open_bus & 0b1100_0000)
                 } else {
                     self.read_data()
@@ -141,7 +141,7 @@ impl Registers {
     fn write_address(&mut self, value: u8) {
         if self.latch {
             self.t_address.set_low_byte(value);
-            self.v_address = self.t_address.clone();
+            self.v_address = self.t_address;
         } else {
             self.t_address.set_high_byte(value);
         }
@@ -209,12 +209,12 @@ mod test {
         reg.write_register(0x2005, 0b10101_010);
         assert_eq!(reg.fine_x, 0b010);
         assert_eq!(reg.t_address.coarse_x(), 0b10101);
-        assert_eq!(reg.latch, true);
+        assert!(reg.latch);
 
         reg.write_register(0x2005, 0b01010_101);
         assert_eq!(reg.t_address.fine_y(), 0b101);
         assert_eq!(reg.t_address.coarse_y(), 0b01010);
-        assert_eq!(reg.latch, false);
+        assert!(!reg.latch);
     }
 
     #[test]
@@ -223,12 +223,12 @@ mod test {
         reg.write_register(0x2006, 0b11_101010);
         assert_eq!(reg.t_address.high_byte(), 0b00_101010);
         assert_ne!(reg.t_address, reg.v_address);
-        assert_eq!(reg.latch, true);
+        assert!(reg.latch);
 
         reg.write_register(0x2006, 0b1010_1010);
         assert_eq!(reg.t_address.0, 0b0010_1010_1010_1010);
         assert_eq!(reg.t_address, reg.v_address);
-        assert_eq!(reg.latch, false);
+        assert!(!reg.latch);
     }
 
     #[test]
@@ -252,8 +252,8 @@ mod test {
         reg.status.0 = 0b1110_0000;
         let r = reg.read_register(0x2002);
         assert_eq!(r, 0b1110_0000);
-        assert_eq!(reg.latch, false);
-        assert_eq!(reg.status.vblank(), false);
+        assert!(!reg.latch);
+        assert!(!reg.status.vblank());
     }
 
     #[test]
@@ -289,5 +289,4 @@ mod test {
         assert_eq!(reg.read_register(0x2007), 2);
         assert_eq!(reg.read_register(0x2007), 3);
     }
-
 }

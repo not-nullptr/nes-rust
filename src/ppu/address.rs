@@ -1,4 +1,4 @@
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone, PartialEq)]
     pub struct Address(u16);
     impl Debug;
@@ -178,5 +178,4 @@ mod test {
         assert_eq!(a.fine_y(), 0);
         assert_eq!(a.nametable(), 0);
     }
-
 }

@@ -1,4 +1,4 @@
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone)]
     pub struct Mask(u8);
     impl Debug;
@@ -33,30 +33,30 @@ mod test {
     #[test]
     fn test_rendering_sprites() {
         // Sprites shown, but left 8 pixels hidden
-        assert_eq!(Mask(0b0001_0000).rendering_sprites(7), false);
-        assert_eq!(Mask(0b0001_0000).rendering_sprites(8), true);
+        assert!(!Mask(0b0001_0000).rendering_sprites(7));
+        assert!(Mask(0b0001_0000).rendering_sprites(8));
 
         // Sprites shown, and left 8 pixels shown
-        assert_eq!(Mask(0b0001_0100).rendering_sprites(7), true);
-        assert_eq!(Mask(0b0001_0100).rendering_sprites(8), true);
+        assert!(Mask(0b0001_0100).rendering_sprites(7));
+        assert!(Mask(0b0001_0100).rendering_sprites(8));
 
         // Sprites not shown, and left 8 pixels shown
-        assert_eq!(Mask(0b0000_0100).rendering_sprites(7), false);
-        assert_eq!(Mask(0b0000_0100).rendering_sprites(8), false);
+        assert!(!Mask(0b0000_0100).rendering_sprites(7));
+        assert!(!Mask(0b0000_0100).rendering_sprites(8));
     }
 
     #[test]
     fn test_rendering_background() {
         // Background shown, but left 8 pixels hidden
-        assert_eq!(Mask(0b0000_1000).rendering_background(7), false);
-        assert_eq!(Mask(0b0000_1000).rendering_background(8), true);
+        assert!(!Mask(0b0000_1000).rendering_background(7));
+        assert!(Mask(0b0000_1000).rendering_background(8));
 
         // background shown, and left 8 pixels shown
-        assert_eq!(Mask(0b0000_1010).rendering_background(7), true);
-        assert_eq!(Mask(0b0000_1010).rendering_background(8), true);
+        assert!(Mask(0b0000_1010).rendering_background(7));
+        assert!(Mask(0b0000_1010).rendering_background(8));
 
         // background not shown, and left 8 pixels shown
-        assert_eq!(Mask(0b0000_0010).rendering_background(7), false);
-        assert_eq!(Mask(0b0000_0010).rendering_background(8), false);
+        assert!(!Mask(0b0000_0010).rendering_background(7));
+        assert!(!Mask(0b0000_0010).rendering_background(8));
     }
 }

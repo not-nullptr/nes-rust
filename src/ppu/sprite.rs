@@ -1,7 +1,7 @@
 use super::control::Control;
 use super::nth_bit;
 
-bitfield!{
+bitfield! {
     #[derive(Copy, Clone, PartialEq)]
     pub struct SpriteStatus(u8);
     impl Debug;
@@ -16,13 +16,13 @@ pub struct SpriteTileIndex(u8);
 
 impl SpriteTileIndex {
     pub fn base(&self) -> u16 {
-        (0x1000 * (self.0 & 1) as u16)
+        0x1000 * (self.0 & 1) as u16
     }
     pub fn large_offset(&self) -> u16 {
-        (16 * (self.0 & !1) as u16)
+        16 * (self.0 & !1) as u16
     }
     pub fn small_offset(&self) -> u16 {
-        (16 * self.0 as u16)
+        16 * self.0 as u16
     }
 }
 
@@ -57,8 +57,7 @@ impl Sprite {
             control.sprite_tile_base() + self.tile_index.small_offset()
         };
         // TODO: why mod sprite_height?
-        let mut y_offset =
-            ((scanline - self.y as usize) as u16 % control.sprite_height() as u16) as u16;
+        let mut y_offset = (scanline - self.y as usize) as u16 % control.sprite_height() as u16;
 
         if self.status.flip_y() {
             y_offset = control.sprite_height() as u16 - 1 - y_offset;
@@ -99,32 +98,32 @@ mod test {
     #[test]
     fn test_tile_address_small_no_flip() {
         let sprite = Sprite::new(0, &[5, 7, 0, 0]);
-        assert_eq!(sprite.tile_address(5, Control(0)), 0 + (7 * 16) + (5 - 5));
-        assert_eq!(sprite.tile_address(8, Control(0)), 0 + (7 * 16) + (8 - 5));
-        assert_eq!(sprite.tile_address(12, Control(0)), 0 + (7 * 16) + (12 - 5));
-        assert_eq!(sprite.tile_address(13, Control(0)), 0 + (7 * 16) + (5 - 5));
+        assert_eq!(sprite.tile_address(5, Control(0)), (7 * 16));
+        assert_eq!(sprite.tile_address(8, Control(0)), (7 * 16) + (8 - 5));
+        assert_eq!(sprite.tile_address(12, Control(0)), (7 * 16) + (12 - 5));
+        assert_eq!(sprite.tile_address(13, Control(0)), (7 * 16));
     }
 
     #[test]
     fn test_tile_address_small_flip_y() {
         let sprite = Sprite::new(0, &[5, 7, 0b1000_0000, 0]);
-        assert_eq!(sprite.tile_address(5, Control(0)), 0 + (7 * 16) + (12 - 5));
-        assert_eq!(sprite.tile_address(8, Control(0)), 0 + (7 * 16) + (9 - 5));
-        assert_eq!(sprite.tile_address(12, Control(0)), 0 + (7 * 16) + (5 - 5));
-        assert_eq!(sprite.tile_address(13, Control(0)), 0 + (7 * 16) + (12 - 5));
+        assert_eq!(sprite.tile_address(5, Control(0)), (7 * 16) + (12 - 5));
+        assert_eq!(sprite.tile_address(8, Control(0)), (7 * 16) + (9 - 5));
+        assert_eq!(sprite.tile_address(12, Control(0)), (7 * 16));
+        assert_eq!(sprite.tile_address(13, Control(0)), (7 * 16) + (12 - 5));
     }
 
     #[test]
     fn test_tile_address_large_no_flip() {
         let sprite = Sprite::new(0, &[5, 7, 0, 0]);
         let c = Control(0b0010_0000);
-        assert_eq!(sprite.tile_address(5, c), 0x1000 + (6 * 16) + (5 - 5));
+        assert_eq!(sprite.tile_address(5, c), (0x1000 + (6 * 16)));
         assert_eq!(sprite.tile_address(8, c), 0x1000 + (6 * 16) + (8 - 5));
         assert_eq!(sprite.tile_address(12, c), 0x1000 + (6 * 16) + (12 - 5));
         assert_eq!(sprite.tile_address(13, c), 0x1000 + (6 * 16) + 8 + (13 - 5));
         assert_eq!(sprite.tile_address(16, c), 0x1000 + (6 * 16) + 8 + (16 - 5));
         assert_eq!(sprite.tile_address(19, c), 0x1000 + (6 * 16) + 8 + (19 - 5));
-        assert_eq!(sprite.tile_address(21, c), 0x1000 + (6 * 16) + (5 - 5));
+        assert_eq!(sprite.tile_address(21, c), (0x1000 + (6 * 16)));
     }
 
     #[test]
@@ -133,7 +132,7 @@ mod test {
         let c = Control(0b0010_0000);
         assert_eq!(sprite.tile_address(5, c), 0x1000 + (6 * 16) + 8 + (20 - 5));
         assert_eq!(sprite.tile_address(6, c), 0x1000 + (6 * 16) + 8 + (19 - 5));
-        assert_eq!(sprite.tile_address(20, c), 0x1000 + (6 * 16) + 0 + (5 - 5));
+        assert_eq!(sprite.tile_address(20, c), (0x1000 + (6 * 16)));
     }
 
     #[test]
@@ -142,7 +141,7 @@ mod test {
         sprite.data_low = 0b1000_0010;
         sprite.data_high = 0b0100_0010;
         assert_eq!(sprite.color_index(4 + 6), 3);
-        assert_eq!(sprite.color_index(4 + 0), 1);
+        assert_eq!(sprite.color_index(4), 1);
         assert_eq!(sprite.color_index(4 + 1), 2);
     }
 
@@ -152,7 +151,7 @@ mod test {
         sprite.data_low = 0b1000_0010;
         sprite.data_high = 0b0100_0010;
         assert_eq!(sprite.color_index(4 + 7 - 6), 3);
-        assert_eq!(sprite.color_index(4 + 7 - 0), 1);
+        assert_eq!(sprite.color_index(4 + 7), 1);
         assert_eq!(sprite.color_index(4 + 7 - 1), 2);
     }
 }

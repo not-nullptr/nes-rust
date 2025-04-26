@@ -2,7 +2,7 @@ use cartridge::Cartridge;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
+#[rustfmt::skip]
 pub const PERIODS: [u8; 16] = [
     214, 190, 170, 160, 143, 127, 113, 107, 95, 80, 71, 64, 53, 42, 36, 27
 ];
@@ -83,10 +83,8 @@ impl DmcChannel {
 
         if !self.enabled {
             self.current_length = 0;
-        } else {
-            if self.current_length == 0 {
-                self.restart();
-            }
+        } else if self.current_length == 0 {
+            self.restart();
         }
     }
 
@@ -136,10 +134,8 @@ impl DmcChannel {
                     if self.output <= 125 {
                         self.output += 2;
                     }
-                } else {
-                    if self.output >= 2 {
-                        self.output -= 2;
-                    }
+                } else if self.output >= 2 {
+                    self.output -= 2;
                 }
                 self.shift_register >>= 1;
                 self.bit_count -= 1;

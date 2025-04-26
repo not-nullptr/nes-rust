@@ -43,12 +43,12 @@ impl Vram {
     pub fn write_byte(&mut self, address: u16, value: u8) {
         let mirroring = self.mirroring();
         match address {
-            0x0000...0x1FFF => match self.cartridge {
+            0x0000..=0x1FFF => match self.cartridge {
                 Some(ref c) => c.borrow_mut().write_chr_byte(address, value),
                 None => panic!("tried to write to non-existant cartridge memory"),
             },
-            0x2000...0x3EFF => self.nametables[mirror_nametable(mirroring, address)] = value,
-            0x3F00...0x3FFF => self.palettes[mirror_palette(address)] = value,
+            0x2000..=0x3EFF => self.nametables[mirror_nametable(mirroring, address)] = value,
+            0x3F00..=0x3FFF => self.palettes[mirror_palette(address)] = value,
             _ => (),
         };
     }
@@ -56,12 +56,12 @@ impl Vram {
     pub fn read_byte(&mut self, address: u16) -> u8 {
         let mirroring = self.mirroring();
         match address {
-            0x0000...0x1FFF => match self.cartridge {
+            0x0000..=0x1FFF => match self.cartridge {
                 Some(ref c) => c.borrow().read_chr_byte(address),
                 None => panic!("tried to read non-existant cartridge memory"),
             },
-            0x2000...0x3EFF => self.nametables[mirror_nametable(mirroring, address)],
-            0x3F00...0x3FFF => self.palettes[mirror_palette(address)],
+            0x2000..=0x3EFF => self.nametables[mirror_nametable(mirroring, address)],
+            0x3F00..=0x3FFF => self.palettes[mirror_palette(address)],
             _ => 0,
         }
     }
@@ -81,12 +81,12 @@ impl Vram {
 
 fn mirror_nametable(mirroring: Mirroring, address: u16) -> usize {
     let address = address as usize;
-    let result = match mirroring {
+
+    match mirroring {
         Mirroring::None => address - 0x2000,
         Mirroring::Horizontal => ((address / 2) & NAMETABLE_SIZE) + (address % NAMETABLE_SIZE),
         Mirroring::Vertical => address % (2 * NAMETABLE_SIZE),
-    };
-    result
+    }
 }
 
 fn mirror_palette(address: u16) -> usize {
@@ -137,22 +137,10 @@ mod test {
 
     fn build_cartridge() -> Rc<RefCell<Cartridge>> {
         let mut data = vec![
-            0x4e,
-            0x45,
-            0x53,
-            0x1a,
-            0x02, // Two pages of PRG-ROM
+            0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x01, // One page of CHR-ROM
-            0x00,
-            0x00,
-            0x01, // One page of PRG-RAM
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
+            0x00, 0x00, 0x01, // One page of PRG-RAM
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
         // add the PRG-ROM

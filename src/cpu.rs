@@ -3,7 +3,7 @@ use std::fmt::Write;
 
 use cpu_debug::{INSTRUCTION_NAMES, INSTRUCTION_SIZES};
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
+#[rustfmt::skip]
 enum Flag {
     Carry      = 0b00000001,
     Zero       = 0b00000010,
@@ -263,7 +263,7 @@ impl Cpu {
             self.p,
             self.bus.unclocked_read_byte(0x6000),
             opcode,
-            INSTRUCTION_NAMES[opcode as usize],
+            INSTRUCTION_NAMES[opcode],
             args,
         );
     }
@@ -1127,7 +1127,7 @@ impl Cpu {
         let result = (a & x).wrapping_sub(operand);
         self.set_flag(Flag::Carry, (a & x) >= operand);
         self.set_flags_zero_negative(result);
-        self.x = result as u8;
+        self.x = result;
     }
 
     fn sbc_nop(&mut self) {
