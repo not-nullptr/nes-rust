@@ -4,7 +4,7 @@ use super::*;
 use crate::cpu::Cpu;
 
 macro_rules! build_cpu {
-    ($bytes:expr) => {{
+    ($bytes:expr_2021) => {{
         let mut rom = vec![
             0x4e, 0x45, 0x53, 0x1a, 0x02, // Two pages of PRG-ROM
             0x00, // Zero pages CHR-ROM means use CHR-RAM
@@ -27,7 +27,7 @@ macro_rules! build_cpu {
     }};
 }
 macro_rules! build_cpu_and_run {
-    ($instruction:expr, $mode:ident, $bytes:expr) => {{
+    ($instruction:expr_2021, $mode:ident, $bytes:expr_2021) => {{
         let op = opcode($instruction, $mode);
         let mut mem = $bytes;
         mem.insert(0, op.code);
@@ -44,7 +44,7 @@ macro_rules! build_cpu_and_run {
 }
 
 macro_rules! test_op {
-    ($instruction:expr, $mode:ident, [$($b:expr),*]{$($sk:ident : $sv:expr),*} => [$($rb:expr),*]{$($ek:ident : $ev:expr),*}) => {
+    ($instruction:expr_2021, $mode:ident, [$($b:expr_2021),*]{$($sk:ident : $sv:expr_2021),*} => [$($rb:expr_2021),*]{$($ek:ident : $ev:expr_2021),*}) => {
         {
             let op = opcode($instruction, $mode);
             let mut mem = Vec::new();
