@@ -22,6 +22,12 @@ pub struct Registers {
     pub vblank_suppress: bool,
 }
 
+impl Default for Registers {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Registers {
     pub fn new() -> Self {
         let mut p = Registers {

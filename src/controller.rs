@@ -16,6 +16,12 @@ pub struct Controller {
     cursor: usize,
 }
 
+impl Default for Controller {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Controller {
     pub fn new() -> Self {
         Controller {

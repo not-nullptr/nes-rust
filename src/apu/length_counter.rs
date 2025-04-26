@@ -12,6 +12,12 @@ pub struct LengthCounter {
     pending_register: Option<u8>,
 }
 
+impl Default for LengthCounter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LengthCounter {
     pub fn new() -> Self {
         LengthCounter {

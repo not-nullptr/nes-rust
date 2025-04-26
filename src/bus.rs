@@ -52,6 +52,12 @@ pub struct Bus {
     cpu_stall_cycles: usize,
 }
 
+impl Default for Bus {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Bus {
     pub fn new() -> Self {
         Bus {

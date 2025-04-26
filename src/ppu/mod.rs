@@ -18,6 +18,12 @@ pub struct Ppu {
     pub renderer: Renderer,
 }
 
+impl Default for Ppu {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Ppu {
     pub fn new() -> Self {
         let mut p = Ppu {

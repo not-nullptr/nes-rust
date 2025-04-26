@@ -15,6 +15,12 @@ pub struct NoiseChannel {
     shift: u16,
 }
 
+impl Default for NoiseChannel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NoiseChannel {
     pub fn new() -> Self {
         NoiseChannel {

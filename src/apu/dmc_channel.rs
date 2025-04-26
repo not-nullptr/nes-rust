@@ -25,6 +25,12 @@ pub struct DmcChannel {
     cpu_stall_cycles: u8,
 }
 
+impl Default for DmcChannel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl DmcChannel {
     pub fn new() -> Self {
         DmcChannel {

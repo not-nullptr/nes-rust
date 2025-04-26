@@ -28,6 +28,12 @@ pub struct Renderer {
     pub pixels: Vec<u32>,
 }
 
+impl Default for Renderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Renderer {
     pub fn new() -> Self {
         let mut r = Renderer {

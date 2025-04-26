@@ -16,6 +16,12 @@ pub struct TriangleChannel {
     control_flag: bool,
 }
 
+impl Default for TriangleChannel {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TriangleChannel {
     pub fn new() -> Self {
         TriangleChannel {

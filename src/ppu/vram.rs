@@ -12,6 +12,12 @@ pub struct Vram {
     cartridge: Option<Rc<RefCell<Cartridge>>>,
 }
 
+impl Default for Vram {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Vram {
     pub fn new() -> Self {
         Vram {

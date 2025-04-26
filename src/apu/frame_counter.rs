@@ -21,6 +21,12 @@ pub struct FrameCounter {
     mode: Mode,
 }
 
+impl Default for FrameCounter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl FrameCounter {
     pub fn new() -> Self {
         FrameCounter {

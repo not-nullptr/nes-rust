@@ -33,6 +33,12 @@ pub struct Apu {
     filters: [FirstOrderFilter; 3],
 }
 
+impl Default for Apu {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Apu {
     pub fn new() -> Self {
         Apu {

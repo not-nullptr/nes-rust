@@ -15,6 +15,12 @@ pub struct Envelope {
     start: bool,
 }
 
+impl Default for Envelope {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Envelope {
     pub fn new() -> Self {
         Envelope {
