@@ -106,14 +106,14 @@ mod test {
 
     #[test]
     fn test_attribute_address() {
-        let a = Address(0b0_101_01_01010_10101);
-        assert_eq!(a.attribute_address(), 0b0010_01_1111_010_101);
+        let a = Address(0b0101_0101_0101_0101);
+        assert_eq!(a.attribute_address(), 0b0010_0111_1101_0101);
     }
 
     #[test]
     fn test_tile_offset() {
-        let a = Address(0b0_101_01_01010_10101);
-        assert_eq!(a.tile_offset(0b111), 0b111_0_101);
+        let a = Address(0b0101_0101_0101_0101);
+        assert_eq!(a.tile_offset(0b111), 0b111_0101);
     }
 
     #[test]
@@ -121,7 +121,7 @@ mod test {
         let mut a = Address(0);
         let b = Address(0b1111_1111_1111_1111);
         a.copy_x(b);
-        assert_eq!(a.0, 0b0_000_01_00000_11111);
+        assert_eq!(a.0, 0b0000_0100_0001_1111);
     }
 
     #[test]
@@ -129,7 +129,7 @@ mod test {
         let mut a = Address(0);
         let b = Address(0b1111_1111_1111_1111);
         a.copy_y(b);
-        assert_eq!(a.0, 0b0_111_10_11111_00000);
+        assert_eq!(a.0, 0b0111_1011_1110_0000);
     }
 
     #[test]

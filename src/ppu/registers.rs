@@ -4,7 +4,7 @@ use super::mask::Mask;
 use super::status::Status;
 use super::vram::Vram;
 
-use rand::{thread_rng, Rng};
+use rand::{Rng, thread_rng};
 
 pub struct Registers {
     pub vram: Vram,
@@ -206,12 +206,12 @@ mod test {
     #[test]
     fn test_write_scroll() {
         let mut reg = Registers::new();
-        reg.write_register(0x2005, 0b10101_010);
+        reg.write_register(0x2005, 0b1010_1010);
         assert_eq!(reg.fine_x, 0b010);
         assert_eq!(reg.t_address.coarse_x(), 0b10101);
         assert!(reg.latch);
 
-        reg.write_register(0x2005, 0b01010_101);
+        reg.write_register(0x2005, 0b0101_0101);
         assert_eq!(reg.t_address.fine_y(), 0b101);
         assert_eq!(reg.t_address.coarse_y(), 0b01010);
         assert!(!reg.latch);
